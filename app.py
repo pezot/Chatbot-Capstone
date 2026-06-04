@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import os
+import re
 from groq import Groq
 
 # ==================== KONFIGURASI HALAMAN ====================
@@ -253,17 +254,42 @@ html, body, [class*='css'] {
 ::-webkit-scrollbar-thumb { background: #cbbdf5; border-radius: 99px; }
 </style>''', unsafe_allow_html=True)
 
-# ==================== PROMPT SISTEM (sama) ====================
+# ==================== PROMPT SISTEM yang DIPERKUAT ====================
 SYSTEM_PROMPT = (
-    "Kamu adalah AI yang mengekstrak skill teknis dan non-teknis dari deskripsi pekerjaan.\n"
-    "Output kamu HARUS berupa JSON array saja, tanpa teks lain, tanpa markdown backtick.\n"
-    'Format: [{"skill": "Nama Skill", "confidence": 85}, ...]\n'
-    "- confidence: integer 1-100 seberapa penting skill tersebut.\n"
-    "- Ekstrak maksimal 12 skill paling relevan berdasarkan isi deskripsi.\n"
-    "- Tulis nama skill dalam bahasa Inggris.\n"
-    "- Jika teks bukan deskripsi pekerjaan, balas dengan array kosong [].\n"
+    "Kamu adalah AI khusus untuk mengekstrak skill dari deskripsi pekerjaan. "
+    "KAMU TIDAK BOLEH menjawab pertanyaan selain ekstraksi skill dari deskripsi pekerjaan. "
+    "Jika input bukan deskripsi pekerjaan (misalnya: kode program, puisi, pertanyaan umum, perintah coding), "
+    "kamu HARUS merespon dengan array kosong [] dan TIDAK ADA teks lain. "
+    "Output kamu HANYA berupa JSON array, tanpa teks lain, tanpa markdown backtick. "
+    'Format: [{"skill": "Nama Skill", "confidence": 85}, ...] '
+    "- confidence: integer 1-100 seberapa penting skill tersebut. "
+    "- Ekstrak maksimal 12 skill paling relevan berdasarkan isi deskripsi. "
+    "- Tulis nama skill dalam bahasa Inggris. "
     "- Hanya JSON murni, tanpa komentar atau penjelasan apapun."
 )
+
+# ==================== FUNGSI FILTER INPUT ====================
+def is_job_description(text: str) -> bool:
+    """Deteksi apakah teks terlihat seperti deskripsi pekerjaan (bukan kode atau sampah)."""
+    if len(text.strip()) < 50:
+        return False
+    text_lower = text.lower()
+    # Kata kunci positif (job description)
+    pos_keywords = [
+        'responsibilities', 'requirements', 'qualifications', 'job description',
+        'about the role', 'what you will do', 'lowongan', 'deskripsi pekerjaan',
+        'kualifikasi', 'tanggung jawab', 'persyaratan', 'we are looking for'
+    ]
+    # Kata kunci negatif (bukan job description)
+    neg_keywords = [
+        'def ', 'class ', 'import ', 'print(', '```python', '```java',
+        'function', 'console.log', 'buatkan', 'tulis kode', 'puisi', 'cerita'
+    ]
+    has_pos = any(kw in text_lower for kw in pos_keywords)
+    has_neg = any(kw in text_lower for kw in neg_keywords)
+    if has_neg and not has_pos:
+        return False
+    return True
 
 # ==================== FUNGSI EKSTRAKSI DENGAN GROQ ====================
 def extract_skills_groq(job_description):
@@ -323,7 +349,7 @@ st.markdown('''<div class="hero">
 if "messages" not in st.session_state:
     st.session_state.messages = [{
         "role": "assistant",
-        "content": "Halo! Tempel deskripsi pekerjaan dari lowongan yang kamu incar, dan saya akan menganalisis skill apa saja yang dibutuhkan.",
+        "content": "Halo! Tempel deskripsi pekerjaan dari lowongan yang kamu incar, dan saya akan menganalisis skill apa saja yang dibutuhkan. (Saya hanya memproses deskripsi pekerjaan, bukan kode atau pertanyaan lain.)",
         "type": "text"
     }]
 
@@ -334,32 +360,34 @@ for msg in st.session_state.messages:
         else:
             st.markdown(msg["content"])
 
-# ==================== INPUT & RESPON ====================
+# ==================== INPUT & RESPON DENGAN FILTER ====================
 if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
     st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
     with st.chat_message("user"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
-        if len(prompt.strip()) < 20:
+        # Filter awal: cek apakah teks mirip deskripsi pekerjaan
+        if not is_job_description(prompt):
+            resp = "Teks yang Anda masukkan sepertinya **bukan deskripsi pekerjaan**. Saya hanya dapat menganalisis lowongan pekerjaan. Silakan tempel deskripsi pekerjaan dari LinkedIn, Jobstreet, Glints, dll."
+            st.markdown(resp)
+            st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
+        elif len(prompt.strip()) < 20:
             resp = "Deskripsi terlalu singkat. Coba salin keseluruhan deskripsi pekerjaan dari halaman lowongan."
             st.markdown(resp)
             st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
         else:
             placeholder = st.empty()
             placeholder.markdown('<div class="typing-wrap"><div class="typing-top"><div class="typing-dots"><span></span><span></span><span></span></div><span class="typing-main">Menganalisis...</span></div><div class="typing-sub">Membaca dan mengekstrak skill yang relevan.</div></div>', unsafe_allow_html=True)
-            result = extract_skills_groq(prompt)   # <-- INI PERUBAHAN UTAMA
+            result = extract_skills_groq(prompt)
             placeholder.empty()
             if isinstance(result, dict) and "error" in result:
                 resp = f"**Error**: {result['error']}"
                 st.markdown(resp)
                 st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
             elif not result:
-                resp = "Teks yang kamu masukkan sepertinya bukan deskripsi pekerjaan. Coba salin dari LinkedIn, Jobstreet, atau Glints."
+                resp = "Tidak ada skill yang dapat diekstrak. Pastikan teks adalah deskripsi pekerjaan yang lengkap dan mengandung persyaratan/tanggung jawab."
                 st.markdown(resp)
                 st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
             else:
                 st.markdown(render_skill_cards(result), unsafe_allow_html=True)
                 st.session_state.messages.append({"role": "assistant", "skills": result, "type": "skills"})
-
-# ==================== FOOTER (DIUBAH) ====================
-st.markdown('<div class="footer-bar"><span>Groq · llama-3.1-8b-instant</span><span>Ctrl+Enter untuk kirim</span></div>', unsafe_allow_html=True)
