@@ -258,7 +258,6 @@ html, body, [class*='css'] {
 # ==================== INISIALISASI STATE ====================
 if "current_lang" not in st.session_state:
     st.session_state.current_lang = 'en'  # default english
-
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -344,12 +343,10 @@ TRANSLATIONS = {
     }
 }
 
-def get_translation(lang_code: str) -> dict:
-    """Mengembalikan dictionary terjemahan untuk kode bahasa yang diberikan."""
+def get_translation(lang_code):
+    """Mengembalikan dictionary terjemahan, fallback ke 'en' jika tidak ditemukan."""
     if lang_code in TRANSLATIONS:
         return TRANSLATIONS[lang_code]
-    elif lang_code.startswith('zh'):
-        return TRANSLATIONS['zh-cn']
     else:
         return TRANSLATIONS['en']
 
@@ -454,7 +451,7 @@ def render_ui():
     st.markdown(f'<div class="footer-bar"><span>{t["footer_left"]}</span><span>{t["footer_right"]}</span></div>', unsafe_allow_html=True)
     return t
 
-# Jika belum ada pesan, tambahkan greeting (sesuai bahasa saat ini)
+# Jika belum ada pesan, tambahkan greeting (dalam bahasa default: Inggris)
 if not st.session_state.messages:
     default_t = get_translation('en')
     st.session_state.messages.append({
@@ -472,7 +469,7 @@ if prompt:
     # Deteksi bahasa dari input user
     user_lang = detect_language(prompt)
     st.session_state.current_lang = user_lang
-    t = get_translation(user_lang)  # update terjemahan
+    t = get_translation(user_lang)  # update terjemahan untuk pesan error
     
     st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
     with st.chat_message("user"):
