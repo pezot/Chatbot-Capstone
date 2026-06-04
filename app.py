@@ -255,7 +255,7 @@ html, body, [class*='css'] {
 ::-webkit-scrollbar-thumb { background: #cbbdf5; border-radius: 99px; }
 </style>''', unsafe_allow_html=True)
 
-# ==================== SYSTEM PROMPT (BAHASA INGGRIS, UNTUK MULTIBAHASA) ====================
+# ==================== SYSTEM PROMPT (BAHASA INGGRIS) ====================
 SYSTEM_PROMPT = (
     "You are an AI that ONLY extracts skills from job descriptions. "
     "If the input is NOT a job description (e.g., code, poem, general question, or any text that does not describe a job vacancy), "
@@ -278,35 +278,92 @@ def detect_language(text: str) -> str:
         if lang == 'ja': return 'ja'
         if lang == 'ar': return 'ar'
         if lang == 'ko': return 'ko'
-        # tambahkan bahasa lain jika perlu
         return 'en'
     except LangDetectException:
         return 'en'
 
-# ==================== FUNGSI TERJEMAHAN PESAN ERROR ====================
+# ==================== FUNGSI FILTER JOB DESCRIPTION (DIPERKUAT) ====================
+def is_job_description(text: str) -> bool:
+    """Hanya mengizinkan input yang terkait dengan rekomendasi pekerjaan dan skill."""
+    text = text.strip()
+    if len(text) < 20:
+        return False
+    
+    text_lower = text.lower()
+    
+    # Kata kunci positif: job description atau permintaan skill
+    positive_keywords = [
+        # job description (English)
+        'responsibilities', 'requirements', 'qualifications', 
+        'job description', 'about the role', 'what you will do',
+        'we are looking for', 'position', 'role', 'job title',
+        # job description (Indonesia)
+        'lowongan', 'deskripsi pekerjaan', 'kualifikasi', 
+        'tanggung jawab', 'persyaratan', 'posisi', 'peran',
+        'kami mencari', 'bertanggung jawab',
+        # permintaan skill
+        'skill apa', 'skill yang dibutuhkan', 'what skills', 
+        'required skills', 'rekomendasi skill', 'skill recommendation',
+        'skills needed', 'skill apa saja', 'skill apa yang dibutuhkan',
+        # bahasa lain (China, Jepang, Arab, Korea) - contoh sederhana
+        '职位描述', '职责', '技能', '必要なスキル', 'المهارات المطلوبة', '필요한 기술'
+    ]
+    
+    # Cek apakah ada kata kunci positif
+    has_positive = any(kw in text_lower for kw in positive_keywords)
+    if not has_positive:
+        return False
+    
+    # Kata kunci negatif (perintah kode, puisi, dll)
+    negative_keywords = [
+        'def ', 'class ', 'import ', 'print(', '```python', '```java',
+        'function', 'console.log', 'buatkan', 'tulis kode', 'puisi', 
+        'cerita', 'lirik', 'chord', 'koding', 'programming',
+        'code', 'coding', 'algorithm', 'leetcode', 'hackerrank',
+        'write a function', 'create a program', 'build a website',
+        'sederhana', 'library', 'framework', 'database'
+    ]
+    for neg in negative_keywords:
+        if neg in text_lower:
+            return False
+    
+    return True
+
+# ==================== FUNGSI TERJEMAHAN PESAN ====================
 def get_error_message(lang: str) -> str:
     messages = {
-        'id': 'Maaf, chatbot ini didesain untuk rekomendasi pekerjaan.',
-        'en': 'Sorry, this chatbot is designed for job recommendation.',
-        'zh': '抱歉，此聊天机器人专为工作推荐而设计。',
-        'ja': '申し訳ありませんが、このチャットボットは仕事の推薦のために設計されています。',
-        'ar': 'عذرًا، تم تصميم هذا الدردشة الآلي لتوصيات الوظائف.',
-        'ko': '죄송합니다. 이 챗봇은 채용 추천을 위해 설계되었습니다.',
+        'id': 'Maaf, chatbot ini didesain untuk rekomendasi pekerjaan. Silakan tempel deskripsi pekerjaan atau tanyakan skill yang dibutuhkan untuk suatu posisi.',
+        'en': 'Sorry, this chatbot is designed for job recommendation. Please paste a job description or ask about required skills for a position.',
+        'zh': '抱歉，此聊天机器人专为工作推荐而设计。请粘贴职位描述或询问某个职位所需的技能。',
+        'ja': '申し訳ありませんが、このチャットボットは仕事の推薦のために設計されています。有効な求人情報を貼り付けるか、必要なスキルについて質問してください。',
+        'ar': 'عذرًا، تم تصميم هذا الدردشة الآلي لتوصيات الوظائف. يرجى لصق وصف وظيفي أو السؤال عن المهارات المطلوبة لوظيفة معينة.',
+        'ko': '죄송합니다. 이 챗봇은 채용 추천을 위해 설계되었습니다. 유효한 직무 설명을 붙여넣거나 특정 직무에 필요한 기술에 대해 질문하세요.',
     }
     return messages.get(lang, messages['en'])
 
 def get_greeting(lang: str) -> str:
     greetings = {
-        'id': 'Halo! Tempel deskripsi pekerjaan dari lowongan yang kamu incar, dan saya akan menganalisis skill apa saja yang dibutuhkan.',
-        'en': 'Hello! Paste the job description you\'re aiming for, and I will analyze the required skills.',
-        'zh': '你好！粘贴你心仪的职位描述，我将分析所需的技能。',
-        'ja': 'こんにちは！志望する求人情報を貼り付けると、必要なスキルを分析します。',
-        'ar': 'مرحبًا! الصق وصف الوظيفة التي تطمح إليها، وسأقوم بتحليل المهارات المطلوبة.',
-        'ko': '안녕하세요! 원하는 직무 설명을 붙여넣으면 필요한 기술을 분석해 드립니다.',
+        'id': 'Halo! Tempel deskripsi pekerjaan dari lowongan yang kamu incar, atau tanyakan skill apa yang dibutuhkan untuk posisi tertentu.',
+        'en': 'Hello! Paste a job description or ask what skills are needed for a specific position.',
+        'zh': '你好！请粘贴职位描述或询问某个职位所需的技能。',
+        'ja': 'こんにちは！求人情報を貼り付けるか、特定のポジションに必要なスキルを質問してください。',
+        'ar': 'مرحبًا! الصق وصف الوظيفة أو اسأل عن المهارات المطلوبة لوظيفة معينة.',
+        'ko': '안녕하세요! 직무 설명을 붙여넣거나 특정 직무에 필요한 기술에 대해 질문하세요.',
     }
     return greetings.get(lang, greetings['en'])
 
-# ==================== FUNGSI EKSTRAKSI DENGAN GROQ ====================
+def get_analyzing_text(lang: str):
+    analyzing = {
+        'id': ('Menganalisis...', 'Membaca dan mengekstrak skill yang relevan.'),
+        'en': ('Analyzing...', 'Reading and extracting relevant skills.'),
+        'zh': ('分析中...', '阅读并提取相关技能。'),
+        'ja': ('分析中...', '関連スキルを読み取り抽出しています。'),
+        'ar': ('جاري التحليل...', 'قراءة واستخراج المهارات ذات الصلة.'),
+        'ko': ('분석 중...', '관련 기술을 읽고 추출하는 중입니다.')
+    }
+    return analyzing.get(lang, analyzing['en'])
+
+# ==================== EKSTRAKSI SKILL ====================
 def extract_skills_groq(job_description):
     try:
         api_key = st.secrets["GROQ_API_KEY"]
@@ -314,9 +371,8 @@ def extract_skills_groq(job_description):
         return {"error": "GROQ_API_KEY tidak ditemukan. Tambahkan di Secrets Streamlit."}
     
     client = Groq(api_key=api_key)
-    
     try:
-        chat_completion = client.chat.completions.create(
+        completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": "Job description:\n\n" + job_description}
@@ -324,20 +380,20 @@ def extract_skills_groq(job_description):
             model="llama-3.1-8b-instant",
             temperature=0.1,
         )
-        raw = chat_completion.choices[0].message.content.strip()
+        raw = completion.choices[0].message.content.strip()
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
         skills = json.loads(raw)
         if not isinstance(skills, list):
             return []
         return [
-            {"skill": str(i["skill"]), "confidence": round(float(i["confidence"]), 1)}
-            for i in skills if "skill" in i and "confidence" in i
+            {"skill": str(s["skill"]), "confidence": round(float(s["confidence"]), 1)}
+            for s in skills if "skill" in s and "confidence" in s
         ]
     except Exception as e:
-        return {"error": f"Groq API error: {str(e)}"}
+        return {"error": str(e)}
 
-# ==================== FUNGSI RENDER SKILL ====================
+# ==================== RENDER SKILL CARD ====================
 def render_skill_cards(skills):
     if not skills:
         return '<p style="color:#aaa; font-size:0.875rem;">Tidak ada skill yang ditemukan.</p>'
@@ -351,7 +407,7 @@ def render_skill_cards(skills):
     html += '</div><div class="result-footer">Persentase menunjukkan seberapa relevan skill tersebut berdasarkan deskripsi pekerjaan yang diberikan.</div></div>'
     return html
 
-# ==================== UI HEADER (STATIS BAHASA INDONESIA) ====================
+# ==================== UI HEADER ====================
 st.markdown('''<div class="hero">
   <div class="hero-label">AI-Powered Career Tool</div>
   <h1>Temukan skill yang kamu<br>butuhkan, <em>sekarang.</em></h1>
@@ -360,10 +416,9 @@ st.markdown('''<div class="hero">
 
 # ==================== STATE CHAT ====================
 if "messages" not in st.session_state:
-    # Pesan sambutan default (Inggris) akan diperbarui saat user pertama kali chat
     st.session_state.messages = [{
         "role": "assistant",
-        "content": "Hello! Paste the job description you're aiming for, and I will analyze the required skills.",
+        "content": get_greeting('en'),
         "type": "text"
     }]
 
@@ -374,41 +429,36 @@ for msg in st.session_state.messages:
         else:
             st.markdown(msg["content"])
 
-# ==================== INPUT & RESPON (TANPA FILTER MANUAL) ====================
-if prompt := st.chat_input("Paste job description here..."):
-    # Deteksi bahasa user
+# ==================== INPUT & RESPON DENGAN FILTER ====================
+if prompt := st.chat_input("Paste job description or ask about required skills..."):
     user_lang = detect_language(prompt)
-    
-    # Simpan pesan user
     st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
     with st.chat_message("user"):
         st.markdown(prompt)
     
     with st.chat_message("assistant"):
-        placeholder = st.empty()
-        placeholder.markdown('<div class="typing-wrap"><div class="typing-top"><div class="typing-dots"><span></span><span></span><span></span></div><span class="typing-main">Analyzing...</span></div><div class="typing-sub">Reading and extracting relevant skills.</div></div>', unsafe_allow_html=True)
-        
-        result = extract_skills_groq(prompt)
-        placeholder.empty()
-        
-        if isinstance(result, dict) and "error" in result:
-            resp = f"**Error**: {result['error']}"
-            st.markdown(resp)
-            st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
-        elif not result:
-            # Tampilkan pesan error dalam bahasa user
+        if not is_job_description(prompt):
             error_msg = get_error_message(user_lang)
             st.markdown(error_msg)
             st.session_state.messages.append({"role": "assistant", "content": error_msg, "type": "text"})
         else:
-            # Tampilkan hasil skill
-            st.markdown(render_skill_cards(result), unsafe_allow_html=True)
-            st.session_state.messages.append({"role": "assistant", "skills": result, "type": "skills"})
+            analyzing_main, analyzing_sub = get_analyzing_text(user_lang)
+            placeholder = st.empty()
+            placeholder.markdown(f'<div class="typing-wrap"><div class="typing-top"><div class="typing-dots"><span></span><span></span><span></span></div><span class="typing-main">{analyzing_main}</span></div><div class="typing-sub">{analyzing_sub}</div></div>', unsafe_allow_html=True)
+            result = extract_skills_groq(prompt)
+            placeholder.empty()
+            if isinstance(result, dict) and "error" in result:
+                st.markdown(f"**Error**: {result['error']}")
+                st.session_state.messages.append({"role": "assistant", "content": f"**Error**: {result['error']}", "type": "text"})
+            elif not result:
+                error_msg = get_error_message(user_lang)
+                st.markdown(error_msg)
+                st.session_state.messages.append({"role": "assistant", "content": error_msg, "type": "text"})
+            else:
+                st.markdown(render_skill_cards(result), unsafe_allow_html=True)
+                st.session_state.messages.append({"role": "assistant", "skills": result, "type": "skills"})
     
-    # Optional: perbarui pesan sambutan dengan bahasa user untuk percakapan berikutnya
-    # (tidak wajib, karena hanya tampil sekali)
-    if len(st.session_state.messages) == 2:  # setelah pesan pertama user
-        greeting_in_user_lang = get_greeting(user_lang)
-        # ganti pesan pertama assistant dengan bahasa user
-        st.session_state.messages[0]["content"] = greeting_in_user_lang
+    # Perbarui greeting dengan bahasa user setelah chat pertama
+    if len(st.session_state.messages) == 2:
+        st.session_state.messages[0]["content"] = get_greeting(user_lang)
         st.rerun()
