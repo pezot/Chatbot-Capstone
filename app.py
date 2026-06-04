@@ -1,14 +1,12 @@
-
 import streamlit as st
-import requests
 import json
 import os
+from groq import Groq
 
-OLLAMA_URL   = os.getenv("OLLAMA_URL",   "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
-
+# ==================== KONFIGURASI HALAMAN ====================
 st.set_page_config(page_title="SkillMatch", page_icon="○", layout="centered", initial_sidebar_state="collapsed")
 
+# ==================== CSS (sama persis dengan asli) ====================
 st.markdown('''<style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
@@ -255,7 +253,7 @@ html, body, [class*='css'] {
 ::-webkit-scrollbar-thumb { background: #cbbdf5; border-radius: 99px; }
 </style>''', unsafe_allow_html=True)
 
-
+# ==================== PROMPT SISTEM (sama) ====================
 SYSTEM_PROMPT = (
     "Kamu adalah AI yang mengekstrak skill teknis dan non-teknis dari deskripsi pekerjaan.\n"
     "Output kamu HARUS berupa JSON array saja, tanpa teks lain, tanpa markdown backtick.\n"
@@ -267,21 +265,27 @@ SYSTEM_PROMPT = (
     "- Hanya JSON murni, tanpa komentar atau penjelasan apapun."
 )
 
-
-def extract_skills_ollama(job_description):
-    payload = {
-        "model": OLLAMA_MODEL,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": "Deskripsi pekerjaan berikut:\n\n" + job_description}
-        ],
-        "stream": False,
-        "options": {"temperature": 0.1, "num_predict": -1}
-    }
+# ==================== FUNGSI EKSTRAKSI DENGAN GROQ ====================
+def extract_skills_groq(job_description):
+    """Menggunakan Groq API untuk ekstraksi skill"""
     try:
-        resp = requests.post(f"{OLLAMA_URL}/api/chat", json=payload, timeout=300)
-        resp.raise_for_status()
-        raw = resp.json()["message"]["content"].strip()
+        api_key = st.secrets["GROQ_API_KEY"]
+    except Exception:
+        return {"error": "GROQ_API_KEY tidak ditemukan. Tambahkan di Secrets Streamlit."}
+    
+    client = Groq(api_key=api_key)
+    
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": "Deskripsi pekerjaan berikut:\n\n" + job_description}
+            ],
+            model="llama-3.1-8b-instant",
+            temperature=0.1,
+        )
+        raw = chat_completion.choices[0].message.content.strip()
+        # Bersihkan jika ada markdown code block
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
         skills = json.loads(raw)
@@ -291,14 +295,10 @@ def extract_skills_ollama(job_description):
             {"skill": str(i["skill"]), "confidence": round(float(i["confidence"]), 1)}
             for i in skills if "skill" in i and "confidence" in i
         ]
-    except requests.exceptions.ConnectionError:
-        return {"error": "Ollama server tidak dapat dijangkau. Pastikan sel Ollama sudah dijalankan."}
-    except json.JSONDecodeError:
-        return {"error": "Model mengembalikan format yang tidak valid. Coba jalankan ulang."}
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": f"Groq API error: {str(e)}"}
 
-
+# ==================== FUNGSI RENDER SKILL (sama) ====================
 def render_skill_cards(skills):
     if not skills:
         return '<p style="color:#aaa; font-size:0.875rem;">Tidak ada skill yang ditemukan.</p>'
@@ -312,13 +312,14 @@ def render_skill_cards(skills):
     html += '</div><div class="result-footer">Persentase menunjukkan seberapa relevan skill tersebut berdasarkan deskripsi pekerjaan yang diberikan.</div></div>'
     return html
 
-
+# ==================== UI HEADER ====================
 st.markdown('''<div class="hero">
   <div class="hero-label">AI-Powered Career Tool</div>
   <h1>Temukan skill yang kamu<br>butuhkan, <em>sekarang.</em></h1>
   <p class="hero-sub">Paste deskripsi pekerjaan dari lowongan manapun, dan kami akan menganalisis skill apa saja yang paling dibutuhkan untuk posisi tersebut.</p>
 </div>''', unsafe_allow_html=True)
 
+# ==================== STATE CHAT ====================
 if "messages" not in st.session_state:
     st.session_state.messages = [{
         "role": "assistant",
@@ -333,6 +334,7 @@ for msg in st.session_state.messages:
         else:
             st.markdown(msg["content"])
 
+# ==================== INPUT & RESPON ====================
 if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
     st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
     with st.chat_message("user"):
@@ -345,7 +347,7 @@ if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
         else:
             placeholder = st.empty()
             placeholder.markdown('<div class="typing-wrap"><div class="typing-top"><div class="typing-dots"><span></span><span></span><span></span></div><span class="typing-main">Menganalisis...</span></div><div class="typing-sub">Membaca dan mengekstrak skill yang relevan.</div></div>', unsafe_allow_html=True)
-            result = extract_skills_ollama(prompt)
+            result = extract_skills_groq(prompt)   # <-- INI PERUBAHAN UTAMA
             placeholder.empty()
             if isinstance(result, dict) and "error" in result:
                 resp = f"**Error**: {result['error']}"
@@ -359,4 +361,5 @@ if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
                 st.markdown(render_skill_cards(result), unsafe_allow_html=True)
                 st.session_state.messages.append({"role": "assistant", "skills": result, "type": "skills"})
 
-st.markdown(f'<div class="footer-bar"><span>Ollama · {OLLAMA_MODEL}</span><span>Ctrl+Enter untuk kirim</span></div>', unsafe_allow_html=True)
+# ==================== FOOTER (DIUBAH) ====================
+st.markdown('<div class="footer-bar"><span>Groq · llama-3.1-8b-instant</span><span>Ctrl+Enter untuk kirim</span></div>', unsafe_allow_html=True)
