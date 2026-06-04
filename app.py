@@ -3,10 +3,8 @@ import json
 import re
 from groq import Groq
 
-# ==================== KONFIGURASI HALAMAN ====================
 st.set_page_config(page_title="SkillMatch", page_icon="○", layout="centered", initial_sidebar_state="collapsed")
 
-# ==================== CSS (sama persis dengan asli) ====================
 st.markdown('''<style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
@@ -253,46 +251,59 @@ html, body, [class*='css'] {
 ::-webkit-scrollbar-thumb { background: #cbbdf5; border-radius: 99px; }
 </style>''', unsafe_allow_html=True)
 
-# ==================== PROMPT SISTEM yang DIPERKUAT ====================
+# ==================== SYSTEM PROMPT YANG SANGAT KETAT ====================
 SYSTEM_PROMPT = (
-    "Kamu adalah AI khusus untuk mengekstrak skill dari deskripsi pekerjaan. "
-    "KAMU TIDAK BOLEH menjawab pertanyaan selain ekstraksi skill dari deskripsi pekerjaan. "
-    "Jika input bukan deskripsi pekerjaan (misalnya: kode program, puisi, pertanyaan umum, perintah coding), "
-    "kamu HARUS merespon dengan array kosong [] dan TIDAK ADA teks lain. "
-    "Output kamu HANYA berupa JSON array, tanpa teks lain, tanpa markdown backtick. "
-    'Format: [{"skill": "Nama Skill", "confidence": 85}, ...] '
-    "- confidence: integer 1-100 seberapa penting skill tersebut. "
-    "- Ekstrak maksimal 12 skill paling relevan berdasarkan isi deskripsi. "
-    "- Tulis nama skill dalam bahasa Inggris. "
-    "- Hanya JSON murni, tanpa komentar atau penjelasan apapun."
+    "Kamu adalah AI yang HANYA mengekstrak skill dari deskripsi pekerjaan. "
+    "Jika input BUKAN deskripsi pekerjaan (misalnya kode program, puisi, pertanyaan umum, perintah coding, atau teks yang tidak mengandung informasi lowongan kerja), "
+    "kamu HARUS merespon dengan JSON array kosong: []\n"
+    "Output kamu HANYA berupa JSON array murni, tanpa teks lain, tanpa markdown backtick.\n"
+    'Format: [{"skill": "Nama Skill", "confidence": 85}, ...]\n'
+    "confidence: integer 1-100.\n"
+    "Ekstrak maksimal 12 skill paling relevan.\n"
+    "Nama skill dalam bahasa Inggris.\n"
+    "JANGAN pernah menambahkan komentar atau penjelasan."
 )
 
-# ==================== FUNGSI FILTER INPUT ====================
+# ==================== FUNGSI FILTER INPUT YANG LEBIH KETAT ====================
 def is_job_description(text: str) -> bool:
-    """Deteksi apakah teks terlihat seperti deskripsi pekerjaan (bukan kode atau sampah)."""
-    if len(text.strip()) < 50:
+    """Deteksi apakah teks adalah deskripsi pekerjaan yang valid."""
+    text = text.strip()
+    if len(text) < 100:  # Minimal 100 karakter
         return False
+    
     text_lower = text.lower()
-    # Kata kunci positif (job description)
-    pos_keywords = [
-        'responsibilities', 'requirements', 'qualifications', 'job description',
-        'about the role', 'what you will do', 'lowongan', 'deskripsi pekerjaan',
-        'kualifikasi', 'tanggung jawab', 'persyaratan', 'we are looking for'
+    
+    # Kata kunci wajib (minimal 2 dari daftar ini harus ada)
+    required_keywords = [
+        'responsibilities', 'requirements', 'qualifications', 
+        'job description', 'about the role', 'what you will do',
+        'lowongan', 'deskripsi pekerjaan', 'kualifikasi', 
+        'tanggung jawab', 'persyaratan', 'we are looking for',
+        'position', 'role', 'job title'
     ]
-    # Kata kunci negatif (bukan job description)
-    neg_keywords = [
-        'def ', 'class ', 'import ', 'print(', '```python', '```java',
-        'function', 'console.log', 'buatkan', 'tulis kode', 'puisi', 'cerita'
-    ]
-    has_pos = any(kw in text_lower for kw in pos_keywords)
-    has_neg = any(kw in text_lower for kw in neg_keywords)
-    if has_neg and not has_pos:
+    
+    matched = sum(1 for kw in required_keywords if kw in text_lower)
+    if matched < 2:
         return False
+    
+    # Kata kunci negatif (indikasi bukan job desc)
+    negative_keywords = [
+        'def ', 'class ', 'import ', 'print(', '```python', '```java',
+        'function', 'console.log', 'buatkan', 'tulis kode', 'puisi', 
+        'cerita', 'lirik', 'chord', 'koding', 'programming'
+    ]
+    for neg in negative_keywords:
+        if neg in text_lower:
+            return False
+    
+    # Cek apakah teks mengandung kalimat (ada tanda baca titik, tanya, seru)
+    if '.' not in text and '?' not in text and '!' not in text:
+        return False
+    
     return True
 
 # ==================== FUNGSI EKSTRAKSI DENGAN GROQ ====================
 def extract_skills_groq(job_description):
-    """Menggunakan Groq API untuk ekstraksi skill"""
     try:
         api_key = st.secrets["GROQ_API_KEY"]
     except Exception:
@@ -364,13 +375,9 @@ if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
     with st.chat_message("user"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
-        # Filter awal: cek apakah teks mirip deskripsi pekerjaan
+        # Filter ketat
         if not is_job_description(prompt):
             resp = "Maaf, chatbot ini didesain untuk rekomendasi pekerjaan."
-            st.markdown(resp)
-            st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
-        elif len(prompt.strip()) < 20:
-            resp = "Deskripsi terlalu singkat. Coba salin keseluruhan deskripsi pekerjaan dari halaman lowongan."
             st.markdown(resp)
             st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
         else:
