@@ -15,7 +15,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -24,94 +24,89 @@ html, body, [class*="css"] {
     color: #1a1a2e;
 }
 
-.stApp { background: #f7f5ff; }
-
+.stApp { background: #f5f3ff; }
 #MainMenu, footer, header { visibility: hidden; }
 [data-testid="stSidebar"] { display: none !important; }
 
 .block-container {
-    padding-top: 2rem !important;
+    padding-top: 2.5rem !important;
     padding-bottom: 6rem !important;
-    max-width: 680px !important;
+    max-width: 660px !important;
     margin: 0 auto !important;
 }
 
-/* ── Hero ── */
+/* ── Hero ─────────────────────────────── */
 .hero {
     text-align: center;
-    padding: 1.5rem 1rem 2rem;
+    padding: 1rem 1.5rem 2.5rem;
 }
 .hero-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #ede9ff;
-    color: #5b3fc8;
-    font-size: 0.68rem;
+    display: inline-block;
+    background: transparent;
+    color: #7c6bb5;
+    font-size: 0.65rem;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    padding: 0.3rem 0.85rem;
+    padding: 0.28rem 0.9rem;
     border-radius: 99px;
-    border: 1px solid #d8d0ff;
-    margin-bottom: 1.2rem;
+    border: 1px solid #ccc5ef;
+    margin-bottom: 1.4rem;
 }
-.hero h1 {
-    font-size: 2rem;
-    font-weight: 700;
+.hero-title {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 2.6rem;
+    font-weight: 400;
     color: #13102b;
-    line-height: 1.25;
-    margin-bottom: 0.6rem;
-    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.01em;
 }
-.hero h1 em {
+.hero-title em {
     font-style: italic;
-    font-weight: 600;
-    color: #6148d5;
+    color: #5b3fc8;
 }
 .hero-sub {
-    font-size: 0.88rem;
-    color: #6e6b8a;
-    line-height: 1.6;
-    max-width: 420px;
+    font-size: 0.875rem;
+    color: #7a7898;
+    line-height: 1.65;
+    max-width: 400px;
     margin: 0 auto;
+    font-weight: 400;
 }
 
-/* ── Chat messages ── */
+/* ── Chat messages ─────────────────────── */
 [data-testid="stChatMessage"] {
     background: transparent !important;
-    padding: 0.3rem 0 !important;
+    padding: 0.25rem 0 !important;
     border: none !important;
     box-shadow: none !important;
-    align-items: flex-start !important;
 }
-
 [data-testid="stChatMessageAvatarAssistant"] {
-    background: #ede9ff !important;
+    background: #ebe6ff !important;
     border-radius: 50% !important;
-    width: 32px !important;
-    height: 32px !important;
+    width: 30px !important;
+    height: 30px !important;
     flex-shrink: 0 !important;
 }
 [data-testid="stChatMessageAvatarUser"] {
-    background: #6148d5 !important;
+    background: #5b3fc8 !important;
     border-radius: 50% !important;
-    width: 32px !important;
-    height: 32px !important;
+    width: 30px !important;
+    height: 30px !important;
     flex-shrink: 0 !important;
 }
 
 /* Assistant bubble */
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown {
     background: #ffffff;
-    border: 1px solid #e8e3ff;
-    border-radius: 4px 16px 16px 16px;
-    padding: 0.75rem 1rem;
-    font-size: 0.88rem;
-    color: #1a1a2e;
-    line-height: 1.6;
-    box-shadow: 0 1px 4px rgba(97,72,213,0.06);
-    max-width: 100%;
+    border: 1px solid #e4deff;
+    border-radius: 4px 14px 14px 14px;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.875rem;
+    color: #1a1a2e !important;
+    line-height: 1.65;
+    box-shadow: 0 1px 6px rgba(91,63,200,0.07);
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {
     color: #1a1a2e !important;
@@ -119,224 +114,233 @@ html, body, [class*="css"] {
 }
 
 /* User bubble */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+    flex-direction: row-reverse !important;
+}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown {
-    background: linear-gradient(135deg, #6148d5, #7c5ce8);
-    border-radius: 16px 4px 16px 16px;
-    padding: 0.75rem 1rem;
-    font-size: 0.88rem;
+    background: linear-gradient(135deg, #5b3fc8 0%, #7c5ce8 100%);
+    border-radius: 14px 4px 14px 14px;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.875rem;
     color: #ffffff !important;
-    line-height: 1.6;
-    box-shadow: 0 2px 12px rgba(97,72,213,0.25);
-    max-width: 100%;
+    line-height: 1.65;
+    box-shadow: 0 2px 14px rgba(91,63,200,0.22);
+    max-width: 85%;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown p {
     color: #ffffff !important;
     margin: 0;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
-/* ── Skill result card ── */
-.skill-card-wrap {
+/* ── Skill card ────────────────────────── */
+.sc-wrap {
     background: #ffffff;
-    border: 1px solid #e8e3ff;
+    border: 1px solid #e4deff;
     border-radius: 16px;
-    padding: 1.1rem 1.2rem;
-    box-shadow: 0 2px 16px rgba(97,72,213,0.07);
+    padding: 1.1rem 1.15rem 0.9rem;
+    box-shadow: 0 2px 18px rgba(91,63,200,0.07);
 }
-.skill-card-header {
+.sc-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.9rem;
-    padding-bottom: 0.7rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
     border-bottom: 1px solid #f0ecff;
 }
-.skill-card-title {
-    font-size: 0.68rem;
+.sc-title {
+    font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: #6148d5;
+    letter-spacing: 0.1em;
+    color: #5b3fc8;
 }
-.skill-card-count {
-    font-size: 0.68rem;
+.sc-badge {
+    font-size: 0.65rem;
     font-weight: 600;
-    color: #6148d5;
-    background: #f0ecff;
-    padding: 0.15rem 0.6rem;
+    color: #5b3fc8;
+    background: #ede9ff;
+    padding: 0.18rem 0.6rem;
     border-radius: 99px;
 }
-.skill-item {
+.sc-row {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.6rem;
+    gap: 0.7rem;
+    padding: 0.45rem 0.55rem;
     border-radius: 10px;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.3rem;
     background: #faf8ff;
-    transition: background 0.15s;
 }
-.skill-item:hover { background: #f0ecff; }
-.skill-num {
-    font-size: 0.68rem;
+.sc-row:hover { background: #f0ecff; }
+.sc-num {
+    font-size: 0.65rem;
     font-weight: 700;
-    color: #c4b8f0;
-    width: 18px;
+    color: #c4b5f5;
+    width: 16px;
     text-align: center;
     flex-shrink: 0;
 }
-.skill-label {
-    font-size: 0.85rem;
+.sc-name {
+    font-size: 0.84rem;
     font-weight: 500;
     color: #13102b;
     flex: 1;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.skill-track {
-    width: 90px;
-    height: 5px;
-    background: #ede9ff;
+.sc-track {
+    width: 80px;
+    height: 4px;
+    background: #ebe6ff;
     border-radius: 99px;
     flex-shrink: 0;
     overflow: hidden;
 }
-.skill-fill {
+.sc-fill {
     height: 100%;
     border-radius: 99px;
-    background: linear-gradient(90deg, #6148d5, #9b7ef8);
+    background: linear-gradient(90deg, #5b3fc8, #9b7ef8);
 }
-.skill-pct {
-    font-size: 0.75rem;
+.sc-pct {
+    font-size: 0.72rem;
     font-weight: 700;
-    color: #6148d5;
-    width: 32px;
+    color: #5b3fc8;
+    width: 34px;
     text-align: right;
     flex-shrink: 0;
 }
-.skill-card-footer {
-    margin-top: 0.8rem;
-    padding-top: 0.65rem;
+.sc-foot {
+    margin-top: 0.75rem;
+    padding-top: 0.6rem;
     border-top: 1px solid #f0ecff;
-    font-size: 0.65rem;
-    color: #aaa7c4;
+    font-size: 0.62rem;
+    color: #b0adca;
     text-align: center;
     line-height: 1.5;
 }
 
-/* ── Typing indicator ── */
+/* ── Typing indicator ──────────────────── */
 .typing-box {
     background: #ffffff;
-    border: 1px solid #e8e3ff;
-    border-radius: 4px 16px 16px 16px;
-    padding: 0.75rem 1rem;
+    border: 1px solid #e4deff;
+    border-radius: 4px 14px 14px 14px;
+    padding: 0.65rem 0.9rem;
     display: inline-flex;
     flex-direction: column;
-    gap: 0.25rem;
-    box-shadow: 0 1px 4px rgba(97,72,213,0.06);
+    gap: 0.2rem;
+    box-shadow: 0 1px 6px rgba(91,63,200,0.07);
 }
-.typing-label {
+.typing-row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
     font-size: 0.82rem;
     font-weight: 500;
     color: #1a1a2e;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
-.typing-dots {
-    display: inline-flex;
-    gap: 3px;
-    align-items: center;
-}
-.typing-dots span {
-    width: 5px;
-    height: 5px;
+.dots span {
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #9b7ef8;
     display: inline-block;
-    animation: bounce 1.2s infinite ease-in-out;
+    animation: tdot 1.2s infinite ease-in-out;
 }
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-    40% { transform: translateY(-4px); opacity: 1; }
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes tdot {
+    0%,80%,100% { transform:translateY(0); opacity:.4; }
+    40%         { transform:translateY(-4px); opacity:1; }
 }
-.typing-sub {
-    font-size: 0.7rem;
-    color: #9b96ba;
-}
+.typing-sub { font-size: 0.68rem; color: #a09cc0; }
 
-/* ── Chat input — TRANSPARAN ── */
-.stBottom, [data-testid="stBottom"] {
+/* ── Input — fully transparent bg ─────── */
+.stBottom, [data-testid="stBottom"],
+.stBottom > *, [data-testid="stBottom"] > *,
+.stBottom > * > *, [data-testid="stBottom"] > * > * {
     background: transparent !important;
     backdrop-filter: none !important;
     box-shadow: none !important;
-}
-.stBottom > *, [data-testid="stBottom"] > * {
-    background: transparent !important;
+    border: none !important;
 }
 [data-testid="stChatInputContainer"] {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0.5rem 0 !important;
+    padding: 0.4rem 0 !important;
 }
 [data-testid="stChatInput"] {
     background: #ffffff !important;
-    border: 1.5px solid #d4cdf5 !important;
+    border: 1.5px solid #cfc8f5 !important;
     border-radius: 14px !important;
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
     color: #1a1a2e !important;
-    box-shadow: 0 2px 12px rgba(97,72,213,0.08) !important;
-    padding: 0.7rem 1rem !important;
+    box-shadow: 0 2px 14px rgba(91,63,200,0.08) !important;
 }
 [data-testid="stChatInput"]:focus-within {
-    border-color: #6148d5 !important;
-    box-shadow: 0 0 0 3px rgba(97,72,213,0.12), 0 2px 12px rgba(97,72,213,0.08) !important;
+    border-color: #5b3fc8 !important;
+    box-shadow: 0 0 0 3px rgba(91,63,200,0.11), 0 2px 14px rgba(91,63,200,0.08) !important;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d4cdf5; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #cfc8f5; border-radius: 99px; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── System prompt ──────────────────────────────────────────────
-SYSTEM_PROMPT = (
-    "You are an AI that ONLY extracts skills from job descriptions. "
-    "If the input is NOT a job description, respond with an empty JSON array: []\n"
-    "Output MUST be a pure JSON array only, no markdown, no backticks, no explanation.\n"
-    'Format: [{"skill": "Skill Name", "confidence": 85}, ...]\n'
-    "- confidence: integer 1-100.\n"
-    "- Extract max 12 most relevant skills.\n"
-    "- Skill names in English."
-)
+# ── Prompts ────────────────────────────────────────────────────
+SYSTEM_PROMPT = """You are SkillMatch, an AI that ONLY extracts required skills from job descriptions or job-related queries.
+
+STRICT RULES:
+1. You ONLY respond to inputs that are:
+   - Job descriptions / vacancy postings
+   - Questions about what skills are needed for a specific job/role/position
+   Examples of VALID inputs:
+     - "What skills do I need to become a data scientist?"
+     - "We are looking for a backend engineer with 3 years experience..."
+     - "Skills needed for a UI/UX designer role"
+
+2. You MUST return [] (empty array) for ANY input that is NOT job-related. This includes:
+   - Code snippets or programming questions ("write a for loop", "how to use pandas")
+   - General knowledge questions ("what is machine learning", "explain SQL")
+   - Random text, gibberish, or off-topic content
+   - Requests to do tasks unrelated to job skill analysis
+
+3. Output MUST be a pure JSON array only. No markdown, no backticks, no explanation.
+   Format: [{"skill": "Skill Name", "confidence": 85}, ...]
+   - confidence: integer 1-100 (how important this skill is for the role)
+   - Max 12 skills, sorted by relevance
+   - Skill names in English"""
 
 # ── Language helpers ───────────────────────────────────────────
 def detect_lang(text):
     try:
         lg = detect(text)
         if lg in ('id', 'in'): return 'id'
-        if lg == 'en': return 'en'
-        return lg
+        return 'en'
     except LangDetectException:
         return 'en'
 
 TEXTS = {
     'greeting': {
-        'id': 'Halo! Tempel deskripsi pekerjaan atau tanyakan skill yang dibutuhkan untuk posisi tertentu.',
-        'en': 'Hello! Paste a job description or ask what skills are needed for a position.',
+        'id': 'Halo! Tempel deskripsi pekerjaan atau tanyakan skill apa yang dibutuhkan untuk posisi tertentu.',
+        'en': 'Hello! Paste a job description or ask what skills are needed for a specific role.',
     },
-    'error_notjob': {
-        'id': 'Maaf, chatbot ini hanya untuk menganalisis deskripsi pekerjaan. Silakan tempel lowongan kerja yang ingin kamu analisis.',
-        'en': 'Sorry, this chatbot is designed for job descriptions only. Please paste a job listing you want to analyze.',
+    'not_job': {
+        'id': 'Maaf, saya hanya bisa membantu menganalisis deskripsi pekerjaan atau menjawab pertanyaan seputar skill yang dibutuhkan untuk suatu posisi. Silakan tempel lowongan kerja atau tanyakan tentang posisi tertentu.',
+        'en': 'Sorry, I can only help analyze job descriptions or answer questions about skills needed for specific roles. Please paste a job listing or ask about a particular position.',
     },
     'analyzing': {
-        'id': ('Menganalisis deskripsi pekerjaan...', 'Membaca dan mengekstrak skill yang relevan.'),
-        'en': ('Analyzing job description...', 'Reading and extracting relevant skills.'),
+        'id': ('Menganalisis...', 'Membaca dan mengekstrak skill yang relevan.'),
+        'en': ('Analyzing...', 'Reading and extracting relevant skills.'),
     },
     'footer': {
         'id': 'Persentase menunjukkan seberapa relevan skill tersebut berdasarkan deskripsi pekerjaan yang diberikan.',
@@ -359,7 +363,7 @@ def extract_skills(text):
             model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user",   "content": "Job description:\n\n" + text}
+                {"role": "user",   "content": text}
             ],
             temperature=0.1,
         )
@@ -374,35 +378,33 @@ def extract_skills(text):
             for s in data if "skill" in s and "confidence" in s
         ]
     except json.JSONDecodeError:
-        return {"error": "Model mengembalikan format tidak valid. Coba lagi."}
+        return {"error": "Format tidak valid. Coba lagi."}
     except Exception as e:
         return {"error": str(e)}
 
 # ── Render skill cards ─────────────────────────────────────────
 def render_skills(skills, lang='en'):
     if not skills:
-        return '<p style="font-size:0.85rem;color:#9b96ba;">Tidak ada skill yang terdeteksi.</p>'
-    sorted_s = sorted(skills, key=lambda x: x["confidence"], reverse=True)
+        return '<p style="font-size:0.85rem;color:#a09cc0;padding:0.5rem 0;">Tidak ada skill yang terdeteksi.</p>'
     rows = ""
-    for i, s in enumerate(sorted_s, 1):
+    for i, s in enumerate(sorted(skills, key=lambda x: x["confidence"], reverse=True), 1):
         pct = int(s["confidence"])
         rows += (
-            f'<div class="skill-item">'
-            f'<span class="skill-num">{i}</span>'
-            f'<span class="skill-label">{s["skill"]}</span>'
-            f'<div class="skill-track"><div class="skill-fill" style="width:{pct}%"></div></div>'
-            f'<span class="skill-pct">{pct}%</span>'
+            f'<div class="sc-row">'
+            f'<span class="sc-num">{i}</span>'
+            f'<span class="sc-name">{s["skill"]}</span>'
+            f'<div class="sc-track"><div class="sc-fill" style="width:{pct}%"></div></div>'
+            f'<span class="sc-pct">{pct}%</span>'
             f'</div>'
         )
-    footer_text = t('footer', lang)
     return (
-        f'<div class="skill-card-wrap">'
-        f'<div class="skill-card-header">'
-        f'<span class="skill-card-title">Skill yang dibutuhkan</span>'
-        f'<span class="skill-card-count">{len(skills)} skill</span>'
+        f'<div class="sc-wrap">'
+        f'<div class="sc-head">'
+        f'<span class="sc-title">Skill yang dibutuhkan</span>'
+        f'<span class="sc-badge">{len(skills)} skill</span>'
         f'</div>'
         f'{rows}'
-        f'<div class="skill-card-footer">{footer_text}</div>'
+        f'<div class="sc-foot">{t("footer", lang)}</div>'
         f'</div>'
     )
 
@@ -410,7 +412,7 @@ def render_skills(skills, lang='en'):
 st.markdown("""
 <div class="hero">
     <div class="hero-chip">Career Intelligence</div>
-    <h1>Find the skills you <em>actually</em> need</h1>
+    <div class="hero-title">Find the skills you<br><em>actually</em> need</div>
     <p class="hero-sub">Paste any job description and we will extract the must-have skills so you can focus on what matters.</p>
 </div>
 """, unsafe_allow_html=True)
@@ -422,8 +424,6 @@ if "messages" not in st.session_state:
         "content": t('greeting', 'en'),
         "type": "text"
     }]
-if "user_lang" not in st.session_state:
-    st.session_state.user_lang = "en"
 
 # ── Render history ─────────────────────────────────────────────
 for msg in st.session_state.messages:
@@ -434,9 +434,8 @@ for msg in st.session_state.messages:
             st.markdown(msg["content"])
 
 # ── Input ──────────────────────────────────────────────────────
-if prompt := st.chat_input("Paste job description or ask for required skills..."):
+if prompt := st.chat_input("Paste a job description or ask about a role..."):
     lang = detect_lang(prompt)
-    st.session_state.user_lang = lang
 
     st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
     with st.chat_message("user"):
@@ -444,34 +443,30 @@ if prompt := st.chat_input("Paste job description or ask for required skills..."
 
     with st.chat_message("assistant"):
         main_txt, sub_txt = t('analyzing', lang)
-        placeholder = st.empty()
-        placeholder.markdown(
+        ph = st.empty()
+        ph.markdown(
             f'<div class="typing-box">'
-            f'<div class="typing-label">'
-            f'<div class="typing-dots"><span></span><span></span><span></span></div>'
-            f'{main_txt}'
-            f'</div>'
+            f'<div class="typing-row"><div class="dots"><span></span><span></span><span></span></div>{main_txt}</div>'
             f'<div class="typing-sub">{sub_txt}</div>'
             f'</div>',
             unsafe_allow_html=True
         )
 
         result = extract_skills(prompt)
-        placeholder.empty()
+        ph.empty()
 
         if isinstance(result, dict) and "error" in result:
-            msg_text = f"Terjadi masalah: {result['error']}"
-            st.markdown(msg_text)
-            st.session_state.messages.append({"role": "assistant", "content": msg_text, "type": "text"})
+            msg_out = f"Terjadi masalah: {result['error']}"
+            st.markdown(msg_out)
+            st.session_state.messages.append({"role": "assistant", "content": msg_out, "type": "text"})
         elif not result:
-            msg_text = t('error_notjob', lang)
-            st.markdown(msg_text)
-            st.session_state.messages.append({"role": "assistant", "content": msg_text, "type": "text"})
+            msg_out = t('not_job', lang)
+            st.markdown(msg_out)
+            st.session_state.messages.append({"role": "assistant", "content": msg_out, "type": "text"})
         else:
             st.markdown(render_skills(result, lang), unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "skills": result, "lang": lang, "type": "skills"})
 
-    # Update greeting sesuai bahasa user pertama kali
     if len(st.session_state.messages) == 2:
         st.session_state.messages[0]["content"] = t('greeting', lang)
         st.rerun()
