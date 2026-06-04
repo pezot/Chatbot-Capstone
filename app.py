@@ -1,6 +1,5 @@
 import streamlit as st
 import json
-import os
 import re
 from groq import Groq
 
@@ -311,7 +310,6 @@ def extract_skills_groq(job_description):
             temperature=0.1,
         )
         raw = chat_completion.choices[0].message.content.strip()
-        # Bersihkan jika ada markdown code block
         if raw.startswith("```"):
             raw = raw.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
         skills = json.loads(raw)
@@ -324,7 +322,7 @@ def extract_skills_groq(job_description):
     except Exception as e:
         return {"error": f"Groq API error: {str(e)}"}
 
-# ==================== FUNGSI RENDER SKILL (sama) ====================
+# ==================== FUNGSI RENDER SKILL ====================
 def render_skill_cards(skills):
     if not skills:
         return '<p style="color:#aaa; font-size:0.875rem;">Tidak ada skill yang ditemukan.</p>'
@@ -349,7 +347,7 @@ st.markdown('''<div class="hero">
 if "messages" not in st.session_state:
     st.session_state.messages = [{
         "role": "assistant",
-        "content": "Halo! Tempel deskripsi pekerjaan dari lowongan yang kamu incar, dan saya akan menganalisis skill apa saja yang dibutuhkan. (Saya hanya memproses deskripsi pekerjaan, bukan kode atau pertanyaan lain.)",
+        "content": "Halo! Tempel deskripsi pekerjaan dari lowongan yang kamu incar, dan saya akan menganalisis skill apa saja yang dibutuhkan.",
         "type": "text"
     }]
 
@@ -368,7 +366,7 @@ if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
     with st.chat_message("assistant"):
         # Filter awal: cek apakah teks mirip deskripsi pekerjaan
         if not is_job_description(prompt):
-            resp = "Teks yang Anda masukkan sepertinya **bukan deskripsi pekerjaan**. Saya hanya dapat menganalisis lowongan pekerjaan. Silakan tempel deskripsi pekerjaan dari LinkedIn, Jobstreet, Glints, dll."
+            resp = "Maaf, chatbot ini didesain untuk rekomendasi pekerjaan."
             st.markdown(resp)
             st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
         elif len(prompt.strip()) < 20:
@@ -385,7 +383,7 @@ if prompt := st.chat_input("Tempel deskripsi pekerjaan di sini..."):
                 st.markdown(resp)
                 st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
             elif not result:
-                resp = "Tidak ada skill yang dapat diekstrak. Pastikan teks adalah deskripsi pekerjaan yang lengkap dan mengandung persyaratan/tanggung jawab."
+                resp = "Maaf, chatbot ini didesain untuk rekomendasi pekerjaan."
                 st.markdown(resp)
                 st.session_state.messages.append({"role": "assistant", "content": resp, "type": "text"})
             else:
