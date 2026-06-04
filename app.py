@@ -8,7 +8,7 @@ DetectorFactory.seed = 0
 
 st.set_page_config(page_title="SkillMatch", page_icon="○", layout="centered", initial_sidebar_state="collapsed")
 
-# ==================== CSS (sama seperti sebelumnya) ====================
+# ==================== CSS LENGKAP (sama seperti sebelumnya) ====================
 st.markdown('''<style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
@@ -255,6 +255,13 @@ html, body, [class*='css'] {
 ::-webkit-scrollbar-thumb { background: #cbbdf5; border-radius: 99px; }
 </style>''', unsafe_allow_html=True)
 
+# ==================== INISIALISASI STATE ====================
+if "current_lang" not in st.session_state:
+    st.session_state.current_lang = 'en'  # default english
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 # ==================== TERJEMAHAN MULTIBAHASA ====================
 TRANSLATIONS = {
     'id': {
@@ -335,7 +342,6 @@ TRANSLATIONS = {
         'error_not_job': '죄송합니다. 이 챗봇은 채용 추천을 위해 설계되었습니다.',
         'no_skills': '기술을 찾을 수 없습니다.',
     }
-    # Tambahkan bahasa lain sesuai kebutuhan (fr, de, es, hi, th, vi, dll) dengan pola yang sama
 }
 
 def get_translation(lang_code: str) -> dict:
@@ -349,10 +355,9 @@ def get_translation(lang_code: str) -> dict:
 
 # ==================== DETEKSI BAHASA ====================
 def detect_language(text: str) -> str:
-    """Deteksi bahasa dari teks input user."""
+    """Deteksi bahasa dari teks input user, kembalikan kode yang ada di TRANSLATIONS."""
     try:
         lang = detect(text)
-        # Normalisasi kode bahasa
         if lang in ('id', 'in'):
             return 'id'
         elif lang == 'en':
@@ -429,12 +434,7 @@ def render_skill_cards(skills, lang_code):
     html += f'</div><div class="result-footer">{t["result_footer"]}</div></div>'
     return html
 
-# ==================== STATE ====================
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-    st.session_state.current_lang = 'en'
-
-# ==================== UI DINAMIS ====================
+# ==================== RENDER UI ====================
 def render_ui():
     t = get_translation(st.session_state.current_lang)
     
@@ -454,14 +454,16 @@ def render_ui():
     st.markdown(f'<div class="footer-bar"><span>{t["footer_left"]}</span><span>{t["footer_right"]}</span></div>', unsafe_allow_html=True)
     return t
 
-# Jika belum ada pesan, tambahkan greeting dalam bahasa Inggris (sementara)
+# Jika belum ada pesan, tambahkan greeting (sesuai bahasa saat ini)
 if not st.session_state.messages:
+    default_t = get_translation('en')
     st.session_state.messages.append({
         "role": "assistant",
-        "content": get_translation('en')["assistant_greeting"],
+        "content": default_t["assistant_greeting"],
         "type": "text"
     })
 
+# Render UI awal
 t = render_ui()
 
 # ==================== INPUT ====================
@@ -470,7 +472,7 @@ if prompt:
     # Deteksi bahasa dari input user
     user_lang = detect_language(prompt)
     st.session_state.current_lang = user_lang
-    t = get_translation(user_lang)
+    t = get_translation(user_lang)  # update terjemahan
     
     st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
     with st.chat_message("user"):
