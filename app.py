@@ -31,14 +31,14 @@ html, body, [class*="css"] {
 .block-container {
     padding-top: 2.5rem !important;
     padding-bottom: 6rem !important;
-    max-width: 660px !important;
+    max-width: 680px !important;
     margin: 0 auto !important;
 }
 
 /* ── Hero ─────────────────────────────── */
 .hero {
     text-align: center;
-    padding: 1rem 1.5rem 2.5rem;
+    padding: 1rem 2rem 2.5rem;
 }
 .hero-chip {
     display: inline-block;
@@ -59,7 +59,7 @@ html, body, [class*="css"] {
     font-weight: 400;
     color: #13102b;
     line-height: 1.15;
-    margin-bottom: 0.85rem;
+    margin-bottom: 1rem;
     letter-spacing: -0.01em;
 }
 .hero-title em {
@@ -67,12 +67,14 @@ html, body, [class*="css"] {
     color: #5b3fc8;
 }
 .hero-sub {
+    font-family: 'Inter', sans-serif;
     font-size: 0.875rem;
-    color: #7a7898;
-    line-height: 1.65;
-    max-width: 400px;
-    margin: 0 auto;
     font-weight: 400;
+    color: #8580a8;
+    line-height: 1.7;
+    max-width: 380px;
+    margin: 0 auto;
+    letter-spacing: 0.01em;
 }
 
 /* ── Chat messages ─────────────────────── */
@@ -102,11 +104,11 @@ html, body, [class*="css"] {
     background: #ffffff;
     border: 1px solid #e4deff;
     border-radius: 4px 14px 14px 14px;
-    padding: 0.7rem 0.95rem;
+    padding: 0.85rem 1.1rem;
     font-size: 0.875rem;
     color: #1a1a2e !important;
     line-height: 1.65;
-    box-shadow: 0 1px 6px rgba(91,63,200,0.07);
+    box-shadow: 0 1px 6px rgba(91,63,200,0.06);
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {
     color: #1a1a2e !important;
@@ -120,37 +122,35 @@ html, body, [class*="css"] {
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown {
     background: linear-gradient(135deg, #5b3fc8 0%, #7c5ce8 100%);
     border-radius: 14px 4px 14px 14px;
-    padding: 0.7rem 0.95rem;
+    padding: 0.85rem 1.1rem;
     font-size: 0.875rem;
     color: #ffffff !important;
     line-height: 1.65;
     box-shadow: 0 2px 14px rgba(91,63,200,0.22);
-    max-width: 85%;
+    max-width: 82%;
     word-break: break-word;
-    white-space: pre-wrap;
     overflow-wrap: break-word;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown p {
     color: #ffffff !important;
     margin: 0;
     word-break: break-word;
-    white-space: pre-wrap;
 }
 
-/* ── Skill card ────────────────────────── */
+/* ── Skill card — 2 column grid (seperti sebelumnya) ── */
 .sc-wrap {
     background: #ffffff;
     border: 1px solid #e4deff;
     border-radius: 16px;
-    padding: 1.1rem 1.15rem 0.9rem;
+    padding: 1.1rem 1.15rem 1rem;
     box-shadow: 0 2px 18px rgba(91,63,200,0.07);
 }
 .sc-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 0.75rem;
-    margin-bottom: 0.6rem;
+    padding-bottom: 0.7rem;
+    margin-bottom: 0.75rem;
     border-bottom: 1px solid #f0ecff;
 }
 .sc-title {
@@ -168,63 +168,58 @@ html, body, [class*="css"] {
     padding: 0.18rem 0.6rem;
     border-radius: 99px;
 }
-.sc-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.45rem 0.55rem;
-    border-radius: 10px;
-    margin-bottom: 0.3rem;
-    background: #faf8ff;
+.sc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
 }
-.sc-row:hover { background: #f0ecff; }
-.sc-num {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #c4b5f5;
-    width: 16px;
-    text-align: center;
-    flex-shrink: 0;
+.sc-item {
+    background: #faf8ff;
+    border: 1px solid #ede9ff;
+    border-radius: 11px;
+    padding: 0.6rem 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.15s, border-color 0.15s;
+}
+.sc-item:hover {
+    background: #f0ecff;
+    border-color: #c4b5f5;
 }
 .sc-name {
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     font-weight: 500;
     color: #13102b;
-    flex: 1;
-    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
 }
-.sc-track {
-    width: 80px;
-    height: 4px;
-    background: #ebe6ff;
-    border-radius: 99px;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-.sc-fill {
-    height: 100%;
-    border-radius: 99px;
-    background: linear-gradient(90deg, #5b3fc8, #9b7ef8);
-}
-.sc-pct {
-    font-size: 0.72rem;
+.sc-pill {
+    font-size: 0.7rem;
     font-weight: 700;
-    color: #5b3fc8;
-    width: 34px;
-    text-align: right;
+    padding: 0.18rem 0.5rem;
+    border-radius: 99px;
+    white-space: nowrap;
     flex-shrink: 0;
 }
+.pill-high   { background: #e8f5e9; color: #2e7d32; }
+.pill-medium { background: #fff8e1; color: #e65100; }
+.pill-low    { background: #fce4ec; color: #c62828; }
 .sc-foot {
-    margin-top: 0.75rem;
-    padding-top: 0.6rem;
+    margin-top: 0.8rem;
+    padding-top: 0.65rem;
     border-top: 1px solid #f0ecff;
-    font-size: 0.62rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.63rem;
+    font-weight: 400;
     color: #b0adca;
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
 }
 
 /* ── Typing indicator ──────────────────── */
@@ -232,11 +227,11 @@ html, body, [class*="css"] {
     background: #ffffff;
     border: 1px solid #e4deff;
     border-radius: 4px 14px 14px 14px;
-    padding: 0.65rem 0.9rem;
+    padding: 0.75rem 1rem;
     display: inline-flex;
     flex-direction: column;
     gap: 0.2rem;
-    box-shadow: 0 1px 6px rgba(91,63,200,0.07);
+    box-shadow: 0 1px 6px rgba(91,63,200,0.06);
 }
 .typing-row {
     display: flex;
@@ -261,7 +256,7 @@ html, body, [class*="css"] {
 }
 .typing-sub { font-size: 0.68rem; color: #a09cc0; }
 
-/* ── Input — fully transparent bg ─────── */
+/* ── Input — fully transparent ─────────── */
 .stBottom, [data-testid="stBottom"],
 .stBottom > *, [data-testid="stBottom"] > *,
 .stBottom > * > *, [data-testid="stBottom"] > * > * {
@@ -296,28 +291,27 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ── Prompts ────────────────────────────────────────────────────
+# ── System prompt ──────────────────────────────────────────────
 SYSTEM_PROMPT = """You are SkillMatch, an AI that ONLY extracts required skills from job descriptions or job-related queries.
 
 STRICT RULES:
-1. You ONLY respond to inputs that are:
+1. VALID inputs (respond with skill JSON):
    - Job descriptions / vacancy postings
    - Questions about what skills are needed for a specific job/role/position
-   Examples of VALID inputs:
-     - "What skills do I need to become a data scientist?"
-     - "We are looking for a backend engineer with 3 years experience..."
-     - "Skills needed for a UI/UX designer role"
+   - "What skills do I need to become a data scientist?"
+   - "We are looking for a backend engineer..."
+   - "Skills needed for UI/UX designer"
 
-2. You MUST return [] (empty array) for ANY input that is NOT job-related. This includes:
-   - Code snippets or programming questions ("write a for loop", "how to use pandas")
-   - General knowledge questions ("what is machine learning", "explain SQL")
-   - Random text, gibberish, or off-topic content
-   - Requests to do tasks unrelated to job skill analysis
+2. INVALID inputs (respond with empty array []):
+   - Code snippets or programming questions
+   - General knowledge questions unrelated to job skills
+   - Random text, gibberish, math, or off-topic content
+   - Any request that is not about job skill analysis
 
-3. Output MUST be a pure JSON array only. No markdown, no backticks, no explanation.
+3. Output: pure JSON array only. No markdown, no backticks, no explanation.
    Format: [{"skill": "Skill Name", "confidence": 85}, ...]
-   - confidence: integer 1-100 (how important this skill is for the role)
-   - Max 12 skills, sorted by relevance
+   - confidence: integer 1-100
+   - Max 12 skills, most relevant first
    - Skill names in English"""
 
 # ── Language helpers ───────────────────────────────────────────
@@ -335,7 +329,7 @@ TEXTS = {
         'en': 'Hello! Paste a job description or ask what skills are needed for a specific role.',
     },
     'not_job': {
-        'id': 'Maaf, saya hanya bisa membantu menganalisis deskripsi pekerjaan atau menjawab pertanyaan seputar skill yang dibutuhkan untuk suatu posisi. Silakan tempel lowongan kerja atau tanyakan tentang posisi tertentu.',
+        'id': 'Maaf, saya hanya bisa membantu menganalisis deskripsi pekerjaan atau menjawab pertanyaan tentang skill yang dibutuhkan untuk suatu posisi. Silakan tempel lowongan kerja atau tanyakan tentang posisi tertentu.',
         'en': 'Sorry, I can only help analyze job descriptions or answer questions about skills needed for specific roles. Please paste a job listing or ask about a particular position.',
     },
     'analyzing': {
@@ -382,19 +376,18 @@ def extract_skills(text):
     except Exception as e:
         return {"error": str(e)}
 
-# ── Render skill cards ─────────────────────────────────────────
+# ── Render skill cards (2-column grid) ────────────────────────
 def render_skills(skills, lang='en'):
     if not skills:
         return '<p style="font-size:0.85rem;color:#a09cc0;padding:0.5rem 0;">Tidak ada skill yang terdeteksi.</p>'
-    rows = ""
-    for i, s in enumerate(sorted(skills, key=lambda x: x["confidence"], reverse=True), 1):
-        pct = int(s["confidence"])
-        rows += (
-            f'<div class="sc-row">'
-            f'<span class="sc-num">{i}</span>'
+    items = ""
+    for s in sorted(skills, key=lambda x: x["confidence"], reverse=True):
+        c = s["confidence"]
+        pill = "pill-high" if c >= 70 else ("pill-medium" if c >= 40 else "pill-low")
+        items += (
+            f'<div class="sc-item">'
             f'<span class="sc-name">{s["skill"]}</span>'
-            f'<div class="sc-track"><div class="sc-fill" style="width:{pct}%"></div></div>'
-            f'<span class="sc-pct">{pct}%</span>'
+            f'<span class="sc-pill {pill}">{int(c)}%</span>'
             f'</div>'
         )
     return (
@@ -403,7 +396,7 @@ def render_skills(skills, lang='en'):
         f'<span class="sc-title">Skill yang dibutuhkan</span>'
         f'<span class="sc-badge">{len(skills)} skill</span>'
         f'</div>'
-        f'{rows}'
+        f'<div class="sc-grid">{items}</div>'
         f'<div class="sc-foot">{t("footer", lang)}</div>'
         f'</div>'
     )
@@ -413,7 +406,7 @@ st.markdown("""
 <div class="hero">
     <div class="hero-chip">Career Intelligence</div>
     <div class="hero-title">Find the skills you<br><em>actually</em> need</div>
-    <p class="hero-sub">Paste any job description and we will extract the must-have skills so you can focus on what matters.</p>
+    <p class="hero-sub">Paste any job description and we will extract<br>the must-have skills so you can focus on what matters.</p>
 </div>
 """, unsafe_allow_html=True)
 
