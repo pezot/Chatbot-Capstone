@@ -72,7 +72,7 @@ html, body, [class*="css"] {
     font-weight: 400;
     color: #8580a8;
     line-height: 1.7;
-    max-width: 380px;
+    max-width: 460px;
     margin: 0 auto;
     letter-spacing: 0.01em;
 }
@@ -406,7 +406,7 @@ st.markdown("""
 <div class="hero">
     <div class="hero-chip">Career Intelligence</div>
     <div class="hero-title">Find the skills you<br><em>actually</em> need</div>
-    <p class="hero-sub">Paste any job description and we will extract<br>the must-have skills so you can focus on what matters.</p>
+    <p class="hero-sub">Paste any job description and we will extract the must-have skills so you can focus on what matters.</p>
 </div>
 """, unsafe_allow_html=True)
 
