@@ -105,23 +105,27 @@ html, body, [class*="css"] {
     background: #ffffff;
     border: 1px solid #e4deff;
     border-radius: 4px 14px 14px 14px;
-    padding: 0.7rem 1.4rem 0.7rem 1.4rem;
+    padding: 0 !important;
     font-size: 0.875rem;
     font-weight: 400;
     color: #3a3660 !important;
     line-height: 1.6;
     letter-spacing: 0.03em;
-    font-variant-numeric: tabular-nums;
     box-shadow: 0 1px 6px rgba(91,63,200,0.06);
-    display: flex;
-    align-items: center;
-    min-height: 48px;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 52px;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown > div {
+    padding: 0.75rem 1.4rem;
+    width: 100%;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {
     color: #3a3660 !important;
     margin: 0;
     font-weight: 400;
     letter-spacing: 0.03em;
+    line-height: 1.6;
 }
 
 /* User bubble */
