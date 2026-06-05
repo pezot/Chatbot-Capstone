@@ -375,13 +375,15 @@ def is_job_related(text: str) -> bool:
     if len(t_lower.split()) < 3:
         return False
 
-    # Sinyal kode yang SANGAT spesifik — bukan kata biasa
+    # Kode program — hanya yang benar-benar pattern kode, bukan kata umum
     hard_code = [
-        'def ', 'class ', 'import ', 'from ', 'print(',
-        'console.log(', 'system.out.print', 'printf(',
-        '#include <', '<?php', 'public static void',
-        'select * from', 'insert into', 'create table',
-        '#!/usr', 'pip install', 'npm install',
+        'def ', 'class ', 'import numpy', 'import pandas', 'import os',
+        'import sys', 'from sklearn', 'from torch', 'from tensorflow',
+        'print(', 'console.log(', 'system.out.print', 'printf(',
+        '#include <', '<?php', 'public static void main',
+        'select * from', 'insert into (', 'create table ',
+        '#!/usr', 'pip install ', 'npm install ',
+        '{ return ', '=> {', 'async function',
     ]
     for sig in hard_code:
         if sig in t_lower:
@@ -393,12 +395,13 @@ def is_job_related(text: str) -> bool:
         'solve ', 'write a poem', 'give me a joke',
         'translate ', 'summarize this', 'buatkan kode',
         'buat program', 'buat fungsi', 'contoh program',
+        'how to install', 'how to use',
     ]
     for phrase in non_job_starts:
         if t_lower.startswith(phrase):
             return False
 
-    # Lolos semua filter — izinkan
+    # Semua lolos — biarkan LLM yang putuskan
     return True
 
 
