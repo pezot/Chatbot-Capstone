@@ -72,9 +72,10 @@ html, body, [class*="css"] {
     font-weight: 400;
     color: #8580a8;
     line-height: 1.7;
-    max-width: 460px;
+    max-width: 560px;
     margin: 0 auto;
     letter-spacing: 0.01em;
+    padding: 0 1rem;
 }
 
 /* ── Chat messages ─────────────────────── */
