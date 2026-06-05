@@ -368,57 +368,39 @@ def t(key, lang):
 
 # ── Validasi input sebelum panggil API ────────────────────────
 def is_job_related(text: str) -> bool:
-    t_lower = text.lower().strip()
-    if len(t_lower.split()) < 4:
+    t = text.strip()
+    t_lower = t.lower()
+
+    # Terlalu pendek
+    if len(t_lower.split()) < 3:
         return False
 
-    # Kalau ada kata job/skill/posisi yang jelas, langsung izinkan
-    priority_job = [
-        'job', 'skill', 'hire', 'hiring', 'vacancy', 'position',
-        'lowongan', 'kerja', 'pekerjaan', 'karir', 'rekrut',
+    # Sinyal kode yang SANGAT spesifik — bukan kata biasa
+    hard_code = [
+        'def ', 'class ', 'import ', 'from ', 'print(',
+        'console.log(', 'system.out.print', 'printf(',
+        '#include <', '<?php', 'public static void',
+        'select * from', 'insert into', 'create table',
+        '#!/usr', 'pip install', 'npm install',
     ]
-    if any(w in t_lower for w in priority_job):
-        return True
-
-    code_signals = [
-        'import ', 'from ', 'def ', 'class ', 'print(', 'return ',
-        'while ', 'if __name__', 'select ', 'insert ', 'create table',
-        'npm ', 'pip install', '```', '<?php', '<html', '<div',
-        'function(', 'console.log', 'system.out', 'printf(',
-        '#include', 'var ', 'let ', 'const ', 'public static',
-    ]
-    for sig in code_signals:
+    for sig in hard_code:
         if sig in t_lower:
             return False
 
+    # Kalimat yang jelas bukan job
     non_job_starts = [
-        'what is ', 'explain ', 'tell me about ', 'how does ',
-        'define ', 'write a poem', 'translate ', 'calculate ',
-        'solve ', 'give me a joke', 'summarize ',
-        'buatkan kode', 'buat kode', 'contoh kode',
+        'what is ', 'explain ', 'define ', 'calculate ',
+        'solve ', 'write a poem', 'give me a joke',
+        'translate ', 'summarize this', 'buatkan kode',
+        'buat program', 'buat fungsi', 'contoh program',
     ]
     for phrase in non_job_starts:
         if t_lower.startswith(phrase):
             return False
 
-    job_signals = [
-        'engineer','developer','analyst','manager','designer',
-        'scientist','architect','lead','senior','junior','intern',
-        'director','officer','specialist','consultant','coordinator',
-        'administrator','executive','head of','vp of','cto','ceo',
-        'frontend','backend','fullstack','full stack','devops',
-        'mobile','ios','android','machine learning','cloud','security',
-        'product','marketing','sales','finance','accounting',
-        'we are looking','we are hiring','job description','requirements',
-        'responsibilities','qualifications','experience','years of',
-        'opportunity','vacancy','position','role','hiring','recruit',
-        'skill','skills','knowledge','proficiency','candidate',
-        'salary','remote','hybrid','full-time','part-time','contract',
-        'lowongan','pekerjaan','posisi','jabatan','dibutuhkan',
-        'mencari','bergabung','kualifikasi','pengalaman','keahlian',
-        'kemampuan','gaji','tanggung jawab','persyaratan',
-    ]
-    return any(sig in t_lower for sig in job_signals)
+    # Lolos semua filter — izinkan
+    return True
+
 
 # ── Groq API ───────────────────────────────────────────────────
 def extract_skills(text):
