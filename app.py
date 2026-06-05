@@ -117,8 +117,9 @@ html, body, [class*="css"] {
     min-height: 0;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown > div {
-    padding: 0.55rem 1.4rem;
+    padding: 0.75rem 1.6rem 0.95rem 1.6rem;
     width: 100%;
+    text-align: center;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {
     color: #3a3660 !important;
