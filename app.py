@@ -105,15 +105,19 @@ html, body, [class*="css"] {
     background: #ffffff;
     border: 1px solid #e4deff;
     border-radius: 4px 14px 14px 14px;
-    padding: 0.85rem 1.1rem;
+    padding: 1.1rem 1.4rem;
     font-size: 0.875rem;
-    color: #1a1a2e !important;
-    line-height: 1.65;
+    font-weight: 300;
+    color: #3a3660 !important;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
     box-shadow: 0 1px 6px rgba(91,63,200,0.06);
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {
-    color: #1a1a2e !important;
+    color: #3a3660 !important;
     margin: 0;
+    font-weight: 300;
+    letter-spacing: 0.01em;
 }
 
 /* User bubble */
