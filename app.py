@@ -359,6 +359,53 @@ TEXTS = {
 def t(key, lang):
     return TEXTS[key].get(lang, TEXTS[key]['en'])
 
+
+# ── Validasi input sebelum panggil API ────────────────────────
+def is_job_related(text: str) -> bool:
+    t_lower = text.lower().strip()
+    if len(t_lower.split()) < 4:
+        return False
+
+    code_signals = [
+        'import ', 'from ', 'def ', 'class ', 'print(', 'return ',
+        'while ', 'if __name__', 'select ', 'insert ', 'create table',
+        'npm ', 'pip install', '```', '<?php', '<html', '<div',
+        'function(', 'console.log', 'system.out', 'printf(',
+        '#include', 'var ', 'let ', 'const ', 'public static',
+    ]
+    for sig in code_signals:
+        if sig in t_lower:
+            return False
+
+    non_job_starts = [
+        'what is ', 'explain ', 'tell me about ', 'how does ',
+        'define ', 'write a poem', 'translate ', 'calculate ',
+        'solve ', 'give me a joke', 'summarize ',
+        'buatkan kode', 'buat kode', 'contoh kode',
+    ]
+    for phrase in non_job_starts:
+        if t_lower.startswith(phrase):
+            return False
+
+    job_signals = [
+        'engineer','developer','analyst','manager','designer',
+        'scientist','architect','lead','senior','junior','intern',
+        'director','officer','specialist','consultant','coordinator',
+        'administrator','executive','head of','vp of','cto','ceo',
+        'frontend','backend','fullstack','full stack','devops',
+        'mobile','ios','android','machine learning','cloud','security',
+        'product','marketing','sales','finance','accounting',
+        'we are looking','we are hiring','job description','requirements',
+        'responsibilities','qualifications','experience','years of',
+        'opportunity','vacancy','position','role','hiring','recruit',
+        'skill','skills','knowledge','proficiency','candidate',
+        'salary','remote','hybrid','full-time','part-time','contract',
+        'lowongan','pekerjaan','posisi','jabatan','dibutuhkan',
+        'mencari','bergabung','kualifikasi','pengalaman','keahlian',
+        'kemampuan','gaji','tanggung jawab','persyaratan',
+    ]
+    return any(sig in t_lower for sig in job_signals)
+
 # ── Groq API ───────────────────────────────────────────────────
 def extract_skills(text):
     try:
@@ -459,7 +506,10 @@ if prompt := st.chat_input("Paste a job description or ask about a role..."):
             unsafe_allow_html=True
         )
 
-        result = extract_skills(prompt)
+        if not is_job_related(prompt):
+            result = []
+        else:
+            result = extract_skills(prompt)
         ph.empty()
 
         if isinstance(result, dict) and "error" in result:
