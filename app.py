@@ -136,7 +136,7 @@ html, body, [class*="css"] {
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown {
     background: linear-gradient(135deg, #5b3fc8 0%, #7c5ce8 100%);
     border-radius: 14px 4px 14px 14px;
-    padding: 0.85rem 1.1rem;
+    padding: 0 !important;
     font-size: 0.875rem;
     color: #ffffff !important;
     line-height: 1.65;
@@ -145,10 +145,16 @@ html, body, [class*="css"] {
     word-break: break-word;
     overflow-wrap: break-word;
 }
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown > div {
+    padding: 0.4rem 1.6rem 1.2rem 1.6rem;
+    width: 100%;
+    text-align: center;
+}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown p {
     color: #ffffff !important;
     margin: 0;
     word-break: break-word;
+    letter-spacing: 0.03em;
 }
 
 /* ── Skill card — 2 column grid (seperti sebelumnya) ── */
@@ -365,6 +371,14 @@ def is_job_related(text: str) -> bool:
     t_lower = text.lower().strip()
     if len(t_lower.split()) < 4:
         return False
+
+    # Kalau ada kata job/skill/posisi yang jelas, langsung izinkan
+    priority_job = [
+        'job', 'skill', 'hire', 'hiring', 'vacancy', 'position',
+        'lowongan', 'kerja', 'pekerjaan', 'karir', 'rekrut',
+    ]
+    if any(w in t_lower for w in priority_job):
+        return True
 
     code_signals = [
         'import ', 'from ', 'def ', 'class ', 'print(', 'return ',
