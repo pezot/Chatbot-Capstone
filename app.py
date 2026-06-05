@@ -114,10 +114,10 @@ html, body, [class*="css"] {
     box-shadow: 0 1px 6px rgba(91,63,200,0.06);
     display: flex !important;
     align-items: center !important;
-    min-height: 52px;
+    min-height: 0;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown > div {
-    padding: 0.75rem 1.4rem;
+    padding: 0.55rem 1.4rem;
     width: 100%;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {
