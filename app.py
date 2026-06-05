@@ -117,7 +117,7 @@ html, body, [class*="css"] {
     min-height: 0;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown > div {
-    padding: 0.75rem 1.6rem 0.95rem 1.6rem;
+    padding: 0.4rem 1.6rem 1.2rem 1.6rem;
     width: 100%;
     text-align: center;
 }
