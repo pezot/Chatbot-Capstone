@@ -14,7 +14,6 @@ st.set_page_config(
 )
 
 # ── Baca ?theme= dari URL ──────────────────────────────────────
-# Streamlit menyimpan query params di st.query_params
 raw_theme = st.query_params.get("theme", "light")
 dark_mode = (raw_theme == "dark")
 
@@ -90,18 +89,69 @@ else:
         "scroll_thumb":     "#cfc8f5",
     }
 
+BG = T["app_bg"]
+
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
 
+/* ── NUCLEAR BACKGROUND OVERRIDE ─────────────────────────────
+   Streamlit renders background on many nested elements.
+   We override ALL of them with !important to force the theme.
+─────────────────────────────────────────────────────────── */
 *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
-html, body, [class*="css"] {{
+html {{
+    background-color: {BG} !important;
+}}
+body {{
+    background-color: {BG} !important;
     font-family: 'Inter', -apple-system, sans-serif;
     color: {T["text_primary"]};
 }}
 
-.stApp {{ background: {T["app_bg"]}; }}
+/* Streamlit root containers */
+.stApp,
+.stApp > *,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewBlockContainer"],
+[data-testid="stVerticalBlock"],
+[data-testid="stVerticalBlockBorderWrapper"],
+[data-testid="block-container"],
+.main,
+.main > *,
+section[data-testid="stSidebar"],
+.css-1d391kg,
+.css-18e3th9,
+.css-fg4pbf,
+.css-1avcm0n,
+.css-k1ih3n,
+.css-z5fcl4,
+.css-1outpf7 {{
+    background-color: {BG} !important;
+    background: {BG} !important;
+}}
+
+/* The actual white inner wrapper Streamlit uses */
+[data-testid="stAppViewBlockContainer"] > div,
+.block-container,
+.block-container > div,
+.element-container,
+div[class*="stBlock"],
+div[class*="css-"] {{
+    background-color: {BG} !important;
+}}
+
+/* Chat container background */
+[data-testid="stChatMessageContainer"],
+[data-testid="stChatFloatingInputContainer"],
+[data-testid="stBottomBlockContainer"],
+.stChatFloatingInputContainer,
+.stBottomBlockContainer {{
+    background-color: {BG} !important;
+    background: {BG} !important;
+}}
+
 #MainMenu, footer, header {{ visibility: hidden; }}
 [data-testid="stSidebar"] {{ display: none !important; }}
 
@@ -165,33 +215,28 @@ html, body, [class*="css"] {{
 [data-testid="stChatMessageAvatarAssistant"] {{
     background: {T["accent_soft"]} !important;
     border-radius: 50% !important;
-    width: 30px !important;
-    height: 30px !important;
+    width: 30px !important; height: 30px !important;
     flex-shrink: 0 !important;
 }}
 [data-testid="stChatMessageAvatarUser"] {{
     background: {T["accent"]} !important;
     border-radius: 50% !important;
-    width: 30px !important;
-    height: 30px !important;
+    width: 30px !important; height: 30px !important;
     flex-shrink: 0 !important;
 }}
 
 /* Assistant bubble */
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown {{
-    background: {T["bubble_bg"]};
+    background: {T["bubble_bg"]} !important;
     border: 1px solid {T["bubble_border"]};
     border-radius: 4px 14px 14px 14px;
     padding: 0 !important;
     font-size: 0.875rem;
-    font-weight: 400;
     color: {T["bubble_text"]} !important;
     line-height: 1.6;
-    letter-spacing: 0.03em;
     box-shadow: 0 1px 6px rgba(91,63,200,0.06);
     display: flex !important;
     align-items: center !important;
-    min-height: 0;
 }}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown > div {{
     padding: 0.4rem 1.6rem 1.2rem 1.6rem;
@@ -208,7 +253,7 @@ html, body, [class*="css"] {{
     flex-direction: row-reverse !important;
 }}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown {{
-    background: linear-gradient(135deg, {T["user_bubble_from"]} 0%, {T["user_bubble_to"]} 100%);
+    background: linear-gradient(135deg, {T["user_bubble_from"]} 0%, {T["user_bubble_to"]} 100%) !important;
     border-radius: 14px 4px 14px 14px;
     padding: 0 !important;
     font-size: 0.875rem;
@@ -217,7 +262,6 @@ html, body, [class*="css"] {{
     box-shadow: 0 2px 14px rgba(91,63,200,0.22);
     max-width: 82%;
     word-break: break-word;
-    overflow-wrap: break-word;
 }}
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) .stMarkdown > div {{
     padding: 0.4rem 1.6rem 1.2rem 1.6rem;
@@ -230,7 +274,7 @@ html, body, [class*="css"] {{
     word-break: break-word;
 }}
 
-/* ── Skill card ────────────────────────── */
+/* ── Skill card ─────────────────────────── */
 .sc-wrap {{
     background: {T["card_bg"]};
     border: 1px solid {T["card_border"]};
@@ -299,9 +343,9 @@ html, body, [class*="css"] {{
     white-space: nowrap;
     flex-shrink: 0;
 }}
-.pill-high   {{ background: #e8f5e9; color: #2e7d32; }}
-.pill-medium {{ background: #fff8e1; color: #e65100; }}
-.pill-low    {{ background: #fce4ec; color: #c62828; }}
+.pill-high   {{ background: #1a3a1f; color: #6fcf7c; }}
+.pill-medium {{ background: #3a2e00; color: #f0c040; }}
+.pill-low    {{ background: #3a0f1a; color: #f08090; }}
 .sc-foot {{
     margin-top: 0.8rem;
     padding-top: 0.65rem;
@@ -346,17 +390,17 @@ html, body, [class*="css"] {{
 }}
 .typing-sub {{ font-size: 0.68rem; color: {T["text_muted"]}; }}
 
-/* ── Input ─────────────────────────────── */
+/* ── Input bar ─────────────────────────── */
 .stBottom, [data-testid="stBottom"],
 .stBottom > *, [data-testid="stBottom"] > *,
 .stBottom > * > *, [data-testid="stBottom"] > * > * {{
-    background: transparent !important;
+    background: {BG} !important;
     backdrop-filter: none !important;
     box-shadow: none !important;
     border: none !important;
 }}
 [data-testid="stChatInputContainer"] {{
-    background: transparent !important;
+    background: {BG} !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0.4rem 0 !important;
@@ -372,7 +416,7 @@ html, body, [class*="css"] {{
 }}
 [data-testid="stChatInput"]:focus-within {{
     border-color: {T["accent"]} !important;
-    box-shadow: 0 0 0 3px rgba(91,63,200,0.11), 0 2px 14px rgba(91,63,200,0.08) !important;
+    box-shadow: 0 0 0 3px rgba(91,63,200,0.11) !important;
 }}
 textarea[data-testid="stChatInputTextArea"] {{
     background: transparent !important;
@@ -392,28 +436,18 @@ textarea[data-testid="stChatInputTextArea"]::placeholder {{
 SYSTEM_PROMPT = """You are SkillMatch, an AI that ONLY extracts required skills from job descriptions or job-related queries.
 
 STRICT RULES:
-1. VALID inputs (respond with skill JSON):
-   - Job descriptions / vacancy postings
-   - Questions about what skills are needed for a specific job/role/position
-
-2. INVALID inputs (respond with empty array []):
-   - Code snippets or programming questions
-   - General knowledge questions unrelated to job skills
-   - Random text, gibberish, math, or off-topic content
-
-3. Output: pure JSON array only. No markdown, no backticks, no explanation.
+1. VALID inputs: job descriptions, questions about skills needed for a role.
+2. INVALID inputs: respond with empty array [].
+3. Output: pure JSON array only. No markdown, no backticks.
    Format: [{"skill": "Skill Name", "confidence": 85}, ...]
-   - confidence: integer 1-100
-   - Max 12 skills, most relevant first
-   - Skill names in English"""
+   - confidence: integer 1-100, max 12 skills, names in English"""
 
-# ── Language helpers ───────────────────────────────────────────
 def detect_lang(text):
     try:
+        from langdetect.lang_detect_exception import LangDetectException
         lg = detect(text)
-        if lg in ('id', 'in'): return 'id'
-        return 'en'
-    except LangDetectException:
+        return 'id' if lg in ('id', 'in') else 'en'
+    except:
         return 'en'
 
 TEXTS = {
@@ -438,84 +472,53 @@ TEXTS = {
 def t(key, lang):
     return TEXTS[key].get(lang, TEXTS[key]['en'])
 
-def is_job_related(text: str) -> bool:
+def is_job_related(text):
     tl = text.strip().lower()
-    if len(tl.split()) < 3:
-        return False
-    hard_code = [
-        'def ', 'class ', 'import numpy', 'import pandas', 'import os',
-        'import sys', 'from sklearn', 'from torch', 'from tensorflow',
-        'print(', 'console.log(', '#include <', '<?php',
-        'select * from', '#!/usr', 'pip install ', 'npm install ',
-        '=> {', 'async function',
-    ]
-    for sig in hard_code:
-        if sig in tl:
-            return False
-    non_job_starts = [
-        'what is ', 'explain ', 'define ', 'calculate ', 'solve ',
-        'write a poem', 'give me a joke', 'translate ', 'summarize this',
-        'buatkan kode', 'buat program', 'buat fungsi', 'contoh program',
-        'how to install', 'how to use',
-    ]
-    for phrase in non_job_starts:
-        if tl.startswith(phrase):
-            return False
+    if len(tl.split()) < 3: return False
+    for sig in ['def ','class ','import numpy','print(','console.log(','#include <','select * from','pip install ','npm install ']:
+        if sig in tl: return False
+    for phrase in ['what is ','explain ','define ','calculate ','solve ','write a poem','give me a joke','buatkan kode','buat program','how to install']:
+        if tl.startswith(phrase): return False
     return True
 
 def extract_skills(text):
     try:
         api_key = st.secrets["GROQ_API_KEY"]
-    except Exception:
+    except:
         return {"error": "GROQ_API_KEY tidak ditemukan."}
     try:
         client = Groq(api_key=api_key)
         res = client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user",   "content": text}
-            ],
+            messages=[{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":text}],
             temperature=0.1,
         )
         raw = res.choices[0].message.content.strip()
         if raw.startswith("```"):
-            raw = raw.split("\n", 1)[-1].rsplit("```", 1)[0].strip()
+            raw = raw.split("\n",1)[-1].rsplit("```",1)[0].strip()
         data = json.loads(raw)
-        if not isinstance(data, list):
-            return []
-        return [
-            {"skill": str(s["skill"]), "confidence": round(float(s["confidence"]), 1)}
-            for s in data if "skill" in s and "confidence" in s
-        ]
+        if not isinstance(data, list): return []
+        return [{"skill": str(s["skill"]), "confidence": round(float(s["confidence"]),1)}
+                for s in data if "skill" in s and "confidence" in s]
     except json.JSONDecodeError:
-        return {"error": "Format tidak valid. Coba lagi."}
+        return {"error": "Format tidak valid."}
     except Exception as e:
         return {"error": str(e)}
 
 def render_skills(skills, lang='en'):
     if not skills:
-        return f'<p style="font-size:0.85rem;color:{T["text_muted"]};padding:0.5rem 0;">Tidak ada skill yang terdeteksi.</p>'
+        return f'<p style="font-size:0.85rem;color:{T["text_muted"]};padding:0.5rem 0;">Tidak ada skill terdeteksi.</p>'
     items = ""
     for s in sorted(skills, key=lambda x: x["confidence"], reverse=True):
         c = s["confidence"]
         pill = "pill-high" if c >= 70 else ("pill-medium" if c >= 40 else "pill-low")
-        items += (
-            f'<div class="sc-item">'
-            f'<span class="sc-name">{s["skill"]}</span>'
-            f'<span class="sc-pill {pill}">{int(c)}%</span>'
-            f'</div>'
-        )
-    return (
-        f'<div class="sc-wrap">'
-        f'<div class="sc-head">'
-        f'<span class="sc-title">Skill yang dibutuhkan</span>'
-        f'<span class="sc-badge">{len(skills)} skill</span>'
-        f'</div>'
-        f'<div class="sc-grid">{items}</div>'
-        f'<div class="sc-foot">{t("footer", lang)}</div>'
-        f'</div>'
-    )
+        items += (f'<div class="sc-item"><span class="sc-name">{s["skill"]}</span>'
+                  f'<span class="sc-pill {pill}">{int(c)}%</span></div>')
+    return (f'<div class="sc-wrap"><div class="sc-head">'
+            f'<span class="sc-title">Skill yang dibutuhkan</span>'
+            f'<span class="sc-badge">{len(skills)} skill</span></div>'
+            f'<div class="sc-grid">{items}</div>'
+            f'<div class="sc-foot">{t("footer", lang)}</div></div>')
 
 # ── Hero ───────────────────────────────────────────────────────
 st.markdown("""
@@ -526,27 +529,19 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Session state ──────────────────────────────────────────────
 if "messages" not in st.session_state:
-    st.session_state.messages = [{
-        "role": "assistant",
-        "content": t('greeting', 'en'),
-        "type": "text"
-    }]
+    st.session_state.messages = [{"role":"assistant","content":t('greeting','en'),"type":"text"}]
 
-# ── Render history ─────────────────────────────────────────────
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         if msg.get("type") == "skills":
-            st.markdown(render_skills(msg["skills"], msg.get("lang", "en")), unsafe_allow_html=True)
+            st.markdown(render_skills(msg["skills"], msg.get("lang","en")), unsafe_allow_html=True)
         else:
             st.markdown(msg["content"])
 
-# ── Input ──────────────────────────────────────────────────────
 if prompt := st.chat_input("Paste a job description or ask about a role..."):
     lang = detect_lang(prompt)
-
-    st.session_state.messages.append({"role": "user", "content": prompt, "type": "text"})
+    st.session_state.messages.append({"role":"user","content":prompt,"type":"text"})
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -554,10 +549,9 @@ if prompt := st.chat_input("Paste a job description or ask about a role..."):
         main_txt, sub_txt = t('analyzing', lang)
         ph = st.empty()
         ph.markdown(
-            f'<div class="typing-box">'
-            f'<div class="typing-row"><div class="dots"><span></span><span></span><span></span></div>{main_txt}</div>'
-            f'<div class="typing-sub">{sub_txt}</div>'
-            f'</div>',
+            f'<div class="typing-box"><div class="typing-row">'
+            f'<div class="dots"><span></span><span></span><span></span></div>{main_txt}</div>'
+            f'<div class="typing-sub">{sub_txt}</div></div>',
             unsafe_allow_html=True
         )
         result = extract_skills(prompt) if is_job_related(prompt) else []
@@ -566,14 +560,14 @@ if prompt := st.chat_input("Paste a job description or ask about a role..."):
         if isinstance(result, dict) and "error" in result:
             msg_out = f"Terjadi masalah: {result['error']}"
             st.markdown(msg_out)
-            st.session_state.messages.append({"role": "assistant", "content": msg_out, "type": "text"})
+            st.session_state.messages.append({"role":"assistant","content":msg_out,"type":"text"})
         elif not result:
             msg_out = t('not_job', lang)
             st.markdown(msg_out)
-            st.session_state.messages.append({"role": "assistant", "content": msg_out, "type": "text"})
+            st.session_state.messages.append({"role":"assistant","content":msg_out,"type":"text"})
         else:
             st.markdown(render_skills(result, lang), unsafe_allow_html=True)
-            st.session_state.messages.append({"role": "assistant", "skills": result, "lang": lang, "type": "skills"})
+            st.session_state.messages.append({"role":"assistant","skills":result,"lang":lang,"type":"skills"})
 
     if len(st.session_state.messages) == 2:
         st.session_state.messages[0]["content"] = t('greeting', lang)
