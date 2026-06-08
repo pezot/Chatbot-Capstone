@@ -116,8 +116,12 @@ div[class^="css-"],div[class*=" css-"]{{background-color:{BG}!important;}}
 [data-testid="stChatInputContainer"]{{background:{BG}!important;border:none!important;box-shadow:none!important;padding:.4rem 0!important;}}
 [data-testid="stChatInput"]{{background:{T["input_bg"]}!important;border:1.5px solid {T["input_border"]}!important;border-radius:14px!important;font-family:'Inter',sans-serif!important;font-size:.88rem!important;color:{T["input_text"]}!important;box-shadow:0 2px 14px rgba(91,63,200,.08)!important;}}
 [data-testid="stChatInput"]:focus-within{{border-color:{T["accent"]}!important;box-shadow:0 0 0 3px rgba(91,63,200,.11)!important;}}
-textarea[data-testid="stChatInputTextArea"]{{background:transparent!important;color:{T["input_text"]}!important;}}
+textarea[data-testid="stChatInputTextArea"]{{background:transparent!important;color:{T["input_text"]}!important;caret-color:{T["input_text"]}!important;}}
 textarea[data-testid="stChatInputTextArea"]::placeholder{{color:{T["text_muted"]}!important;}}
+[data-testid="stChatInput"] textarea,
+[data-testid="stChatInputContainer"] textarea,
+[data-testid="stChatInputContainer"] *{{color:{T["input_text"]}!important;}}
+div[data-testid="stChatInput"] > div > textarea{{color:{T["input_text"]}!important;background:transparent!important;}}
 ::-webkit-scrollbar{{width:4px;}}::-webkit-scrollbar-track{{background:transparent;}}::-webkit-scrollbar-thumb{{background:{T["scroll_thumb"]};border-radius:99px;}}
 </style>
 """, unsafe_allow_html=True)
@@ -259,4 +263,3 @@ if prompt := st.chat_input("Paste a job description or ask about a role..."):
     if len(st.session_state.messages) == 2:
         st.session_state.messages[0]["content"] = t('greeting', lang)
         st.rerun()
-
