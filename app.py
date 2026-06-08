@@ -13,13 +13,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ── Init theme state ───────────────────────────────────────────
-if "dark_mode" not in st.session_state:
-    st.session_state.dark_mode = False
+# ── Baca ?theme= dari URL ──────────────────────────────────────
+# Streamlit menyimpan query params di st.query_params
+raw_theme = st.query_params.get("theme", "light")
+dark_mode = (raw_theme == "dark")
 
 # ── Theme variables ────────────────────────────────────────────
-if st.session_state.dark_mode:
-    theme = {
+if dark_mode:
+    T = {
         "app_bg":           "#0f0d1a",
         "text_primary":     "#e8e4ff",
         "text_secondary":   "#9b96c8",
@@ -52,13 +53,9 @@ if st.session_state.dark_mode:
         "input_border":     "#3d3068",
         "input_text":       "#e8e4ff",
         "scroll_thumb":     "#3d3068",
-        "toggle_bg":        "#2a1f4a",
-        "toggle_border":    "#5b3fc8",
-        "toggle_icon":      "🌙",
-        "toggle_label":     "Dark",
     }
 else:
-    theme = {
+    T = {
         "app_bg":           "#f5f3ff",
         "text_primary":     "#1a1a2e",
         "text_secondary":   "#8580a8",
@@ -91,13 +88,7 @@ else:
         "input_border":     "#cfc8f5",
         "input_text":       "#1a1a2e",
         "scroll_thumb":     "#cfc8f5",
-        "toggle_bg":        "#ede9ff",
-        "toggle_border":    "#ccc5ef",
-        "toggle_icon":      "☀️",
-        "toggle_label":     "Light",
     }
-
-T = theme  # shorthand
 
 st.markdown(f"""
 <style>
@@ -121,18 +112,10 @@ html, body, [class*="css"] {{
     margin: 0 auto !important;
 }}
 
-/* ── Theme Toggle Button ───────────────── */
-.theme-toggle-wrap {{
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 0.5rem;
-    padding-right: 0.5rem;
-}}
-
 /* ── Hero ─────────────────────────────── */
 .hero {{
     text-align: center;
-    padding: 0.5rem 2rem 2.5rem;
+    padding: 1rem 2rem 2.5rem;
 }}
 .hero-chip {{
     display: inline-block;
@@ -218,9 +201,6 @@ html, body, [class*="css"] {{
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) .stMarkdown p {{
     color: {T["bubble_text"]} !important;
     margin: 0;
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    line-height: 1.6;
 }}
 
 /* User bubble */
@@ -248,10 +228,9 @@ html, body, [class*="css"] {{
     color: #ffffff !important;
     margin: 0;
     word-break: break-word;
-    letter-spacing: 0.03em;
 }}
 
-/* ── Skill card ── */
+/* ── Skill card ────────────────────────── */
 .sc-wrap {{
     background: {T["card_bg"]};
     border: 1px solid {T["card_border"]};
@@ -327,13 +306,10 @@ html, body, [class*="css"] {{
     margin-top: 0.8rem;
     padding-top: 0.65rem;
     border-top: 1px solid {T["card_divider"]};
-    font-family: 'Inter', sans-serif;
     font-size: 0.63rem;
-    font-weight: 400;
     color: {T["card_foot"]};
     text-align: center;
     line-height: 1.6;
-    letter-spacing: 0.01em;
 }}
 
 /* ── Typing indicator ──────────────────── */
@@ -404,31 +380,6 @@ textarea[data-testid="stChatInputTextArea"] {{
 }}
 textarea[data-testid="stChatInputTextArea"]::placeholder {{
     color: {T["text_muted"]} !important;
-    opacity: 1 !important;
-}}
-
-/* ── Streamlit button reset ─────────────── */
-div[data-testid="stButton"] button {{
-    background: {T["toggle_bg"]} !important;
-    border: 1px solid {T["toggle_border"]} !important;
-    border-radius: 99px !important;
-    color: {T["chip_color"]} !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    padding: 0.3rem 0.9rem !important;
-    cursor: pointer !important;
-    transition: all 0.2s !important;
-    letter-spacing: 0.05em !important;
-    font-family: 'Inter', sans-serif !important;
-    box-shadow: none !important;
-}}
-div[data-testid="stButton"] button:hover {{
-    background: {T["accent_soft"]} !important;
-    border-color: {T["accent"]} !important;
-}}
-div[data-testid="stButton"] button:focus {{
-    box-shadow: none !important;
-    outline: none !important;
 }}
 
 ::-webkit-scrollbar {{ width: 4px; }}
@@ -444,15 +395,11 @@ STRICT RULES:
 1. VALID inputs (respond with skill JSON):
    - Job descriptions / vacancy postings
    - Questions about what skills are needed for a specific job/role/position
-   - "What skills do I need to become a data scientist?"
-   - "We are looking for a backend engineer..."
-   - "Skills needed for UI/UX designer"
 
 2. INVALID inputs (respond with empty array []):
    - Code snippets or programming questions
    - General knowledge questions unrelated to job skills
    - Random text, gibberish, math, or off-topic content
-   - Any request that is not about job skill analysis
 
 3. Output: pure JSON array only. No markdown, no backticks, no explanation.
    Format: [{"skill": "Skill Name", "confidence": 85}, ...]
@@ -475,8 +422,8 @@ TEXTS = {
         'en': 'Hello! Paste a job description or ask what skills are needed for a specific role.',
     },
     'not_job': {
-        'id': 'Maaf, saya hanya bisa membantu menganalisis deskripsi pekerjaan atau menjawab pertanyaan tentang skill yang dibutuhkan untuk suatu posisi. Silakan tempel lowongan kerja atau tanyakan tentang posisi tertentu.',
-        'en': 'Sorry, I can only help analyze job descriptions or answer questions about skills needed for specific roles. Please paste a job listing or ask about a particular position.',
+        'id': 'Maaf, saya hanya bisa membantu menganalisis deskripsi pekerjaan atau menjawab pertanyaan tentang skill yang dibutuhkan untuk suatu posisi.',
+        'en': 'Sorry, I can only help analyze job descriptions or answer questions about skills needed for specific roles.',
     },
     'analyzing': {
         'id': ('Menganalisis...', 'Membaca dan mengekstrak skill yang relevan.'),
@@ -491,44 +438,36 @@ TEXTS = {
 def t(key, lang):
     return TEXTS[key].get(lang, TEXTS[key]['en'])
 
-
-# ── Validasi input ─────────────────────────────────────────────
 def is_job_related(text: str) -> bool:
-    t = text.strip()
-    t_lower = t.lower()
-    if len(t_lower.split()) < 3:
+    tl = text.strip().lower()
+    if len(tl.split()) < 3:
         return False
     hard_code = [
         'def ', 'class ', 'import numpy', 'import pandas', 'import os',
         'import sys', 'from sklearn', 'from torch', 'from tensorflow',
-        'print(', 'console.log(', 'system.out.print', 'printf(',
-        '#include <', '<?php', 'public static void main',
-        'select * from', 'insert into (', 'create table ',
-        '#!/usr', 'pip install ', 'npm install ',
-        '{ return ', '=> {', 'async function',
+        'print(', 'console.log(', '#include <', '<?php',
+        'select * from', '#!/usr', 'pip install ', 'npm install ',
+        '=> {', 'async function',
     ]
     for sig in hard_code:
-        if sig in t_lower:
+        if sig in tl:
             return False
     non_job_starts = [
-        'what is ', 'explain ', 'define ', 'calculate ',
-        'solve ', 'write a poem', 'give me a joke',
-        'translate ', 'summarize this', 'buatkan kode',
-        'buat program', 'buat fungsi', 'contoh program',
+        'what is ', 'explain ', 'define ', 'calculate ', 'solve ',
+        'write a poem', 'give me a joke', 'translate ', 'summarize this',
+        'buatkan kode', 'buat program', 'buat fungsi', 'contoh program',
         'how to install', 'how to use',
     ]
     for phrase in non_job_starts:
-        if t_lower.startswith(phrase):
+        if tl.startswith(phrase):
             return False
     return True
 
-
-# ── Groq API ───────────────────────────────────────────────────
 def extract_skills(text):
     try:
         api_key = st.secrets["GROQ_API_KEY"]
     except Exception:
-        return {"error": "GROQ_API_KEY tidak ditemukan. Tambahkan ke Streamlit Secrets."}
+        return {"error": "GROQ_API_KEY tidak ditemukan."}
     try:
         client = Groq(api_key=api_key)
         res = client.chat.completions.create(
@@ -554,8 +493,6 @@ def extract_skills(text):
     except Exception as e:
         return {"error": str(e)}
 
-
-# ── Render skill cards ─────────────────────────────────────────
 def render_skills(skills, lang='en'):
     if not skills:
         return f'<p style="font-size:0.85rem;color:{T["text_muted"]};padding:0.5rem 0;">Tidak ada skill yang terdeteksi.</p>'
@@ -579,16 +516,6 @@ def render_skills(skills, lang='en'):
         f'<div class="sc-foot">{t("footer", lang)}</div>'
         f'</div>'
     )
-
-
-# ── Theme Toggle ───────────────────────────────────────────────
-col_space, col_btn = st.columns([5, 1])
-with col_btn:
-    icon = "🌙" if not st.session_state.dark_mode else "☀️"
-    label = f"{icon} {'Dark' if not st.session_state.dark_mode else 'Light'}"
-    if st.button(label, key="theme_toggle"):
-        st.session_state.dark_mode = not st.session_state.dark_mode
-        st.rerun()
 
 # ── Hero ───────────────────────────────────────────────────────
 st.markdown("""
@@ -633,11 +560,7 @@ if prompt := st.chat_input("Paste a job description or ask about a role..."):
             f'</div>',
             unsafe_allow_html=True
         )
-
-        if not is_job_related(prompt):
-            result = []
-        else:
-            result = extract_skills(prompt)
+        result = extract_skills(prompt) if is_job_related(prompt) else []
         ph.empty()
 
         if isinstance(result, dict) and "error" in result:
