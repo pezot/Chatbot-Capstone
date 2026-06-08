@@ -43,7 +43,7 @@ T = {
     "name_color":       "#13102b",
     "input_bg":         "#ffffff",
     "input_border":     "#cfc8f5",
-    "input_text":       "#1a1a2e",
+    "input_text":       "#000000",
     "scroll_thumb":     "#cfc8f5",
     "pill_high_bg":     "#e8f5e9",
     "pill_high_fg":     "#2e7d32",
